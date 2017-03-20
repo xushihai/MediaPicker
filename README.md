@@ -1,6 +1,5 @@
 # MediaPicker
-[![Release](https://jitpack.io/v/xushihai/MediaPicker.svg)]
-(https://jitpack.io/#xushihai/MediaPicker)
+[![](https://jitpack.io/v/xushihai/MediaPicker.svg)](https://jitpack.io/#xushihai/MediaPicker)
 
 # 介绍
 高仿Android版微信的图片和视频选择器。

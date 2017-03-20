@@ -50,7 +50,7 @@ Step 2. Add the dependency
  ```
  
  # 截图
- [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112104.png)](https://nodesource.com/products/nsolid)
-[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112114.png)](https://nodesource.com/products/nsolid)
-[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112128.png)](https://nodesource.com/products/nsolid)
-[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112139.png)](https://nodesource.com/products/nsolid)
+ [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112104.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112114.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112128.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112139.png)]

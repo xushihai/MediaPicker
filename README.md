@@ -3,7 +3,23 @@
 # 介绍
 高仿Android版微信的图片和视频选择器。
 
+# 集成库
+Step 1. Add the JitPack repository to your build file 
+```sh
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+Step 2. Add the dependency
+```sh
+	dependencies {
+	        compile 'com.github.xushihai:MediaPicker:v1.1'
+	}
 
+```
 # 使用教程
 
 ```sh

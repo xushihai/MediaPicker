@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Uikit</string>
+    <string name="label_picker_activity">图片和视频</string>
+    <string name="btn_send">发送</string>
+
+    <string name="__picker_image_count">%1$d张</string>
+    <string name="image_video">图片和视频</string>
+    <string name="all_video">所有视频</string>
+
+    <string name="send_multi">发送(%1$d/%2$d)</string>
+    <string name="original_image">原图(%s)</string>
+    <string name="preview">预览</string>
+    <string name="preview_multi">预览(%d)</string>
+    <string name="select_max_sum">你最多只能选择%1$d张图片或视频</string>
+    <string name="play_video_fail">没有检测到视频播放器</string>
+    <string name="select_media">选择</string>
+    <string name="edit">编辑</string>
+</resources>

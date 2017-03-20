@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="toolbar_height">48dp</dimen>
+    <dimen name="toolbar_text_size">15sp</dimen>
+    <dimen name="__picker_item_directory_height">92dp</dimen>
+    <dimen name="directory_item_height">92dp</dimen>
+    <dimen name="directory_window_margin_top">48dp</dimen>
+
+    <integer name="anim_duration">600</integer>
+</resources>

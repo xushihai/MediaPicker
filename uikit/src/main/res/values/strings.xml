@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Uikit</string>
+    <string name="label_picker_activity" >Images &#038; Videos</string>
+    <string name="btn_send">Send</string>
+
+
+    <color name="__picker_common_primary">#f3f3f3</color>
+    <color name="__picker_text_40">#282828</color>
+    <color name="__picker_text_80">#505050</color>
+    <color name="__picker_text_120">#787878</color>
+    <string name="__picker_image_count">%1$d</string>
+    <string name="image_video">Images &#038; Videos</string>
+    <string name="all_video">All Videos</string>
+
+    <string name="send_multi">Send(%1$d/%2$d)</string>
+    <string name="original_image">Full Image(%s)</string>
+    <string name="preview">Preview</string>
+    <string name="preview_multi">Preview(%d)</string>
+    <string name="select_max_sum">Select up to %1$d images or videos</string>
+    <string name="play_video_fail">play video fail</string>
+    <string name="select_media">Select</string>
+    <string name="edit">Edit</string>
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/directory_item_height"
+    android:background="@drawable/picker_item_bg"
+    android:orientation="horizontal"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp">
+
+    <ImageView
+        android:id="@+id/iv_dir_cover"
+        android:layout_width="76dip"
+        android:layout_height="76dip"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dip"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:layout_width="80dip"
+        android:layout_height="80dip"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_directory_folder"
+        android:layout_alignLeft="@+id/iv_dir_cover"
+        android:layout_alignTop="@+id/iv_dir_cover" />
+
+    <ImageView
+        android:id="@+id/iv_dir"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:checked="true" />
+
+    <LinearLayout
+        android:id="@+id/ll_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/iv_dir"
+        android:layout_toRightOf="@+id/iv_dir_cover"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_dir_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/__picker_text_40" />
+
+        <TextView
+            android:id="@+id/tv_dir_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/__picker_text_80" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignLeft="@+id/iv_dir_cover"
+        android:layout_alignParentBottom="true"
+        android:background="#d9d9d9"
+        android:id="@+id/view" />
+</RelativeLayout>

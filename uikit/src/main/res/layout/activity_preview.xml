@@ -1,0 +1,94 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#000000">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="#393a3f"
+        android:minHeight="@dimen/toolbar_height"
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:titleTextAppearance="@style/TitleStyle">
+
+
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/toolbar_height"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/btn_send"
+            android:background="@drawable/btn_send_bg"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:enabled="false"
+            android:minWidth="60dp"
+            android:textAllCaps="false"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="@string/btn_send" />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/bar_divider"
+        android:layout_width="1dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginTop="12dp"
+        android:background="#2e2e32" />
+
+
+    <RelativeLayout
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:layout_alignParentBottom="true"
+        android:background="#393a3f">
+
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/cb_pre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:paddingRight="16dp"
+            android:text="@string/select_media" />
+
+
+        <TextView
+            android:id="@+id/tv_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:visibility="invisible"
+            android:text="@string/edit" />
+
+        <RadioButton
+            android:id="@+id/rb_original"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

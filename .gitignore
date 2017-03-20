@@ -21,8 +21,6 @@ build/*
 out/
 pttsdk.iml
 workspace.xml
-gradlew.bat
-gradlew
 app/build/*
 app/app.iml
 app/build/*

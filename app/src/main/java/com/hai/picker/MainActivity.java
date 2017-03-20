@@ -20,6 +20,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         GalleryFinal.selectMedias(this, 10);
         EventBus.getDefault().register(this);
+
+        GalleryFinal.selectMedias(this, 10, new GalleryFinal.OnSelectMediaListener() {
+            @Override
+            public void onSelected(ArrayList<Photo> photoArrayList) {
+
+            }
+        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

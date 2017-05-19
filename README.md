@@ -32,6 +32,14 @@ Step 2. Add the dependency
         });
 ```
 ```sh
+  GalleryFinal.selectMedias(this, GalleryFinal.TYPE_IMAGE,10, new GalleryFinal.OnSelectMediaListener() {
+            @Override
+            public void onSelected(ArrayList<Photo> photoArrayList) {
+ 
+            }
+        });
+```
+```sh
     使用EventBus3.0注册，接收选择好的图片和视频列表
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void sendMedia(ArrayList<Photo> photoList) {

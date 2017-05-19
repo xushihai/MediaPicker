@@ -28,21 +28,21 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="@dimen/toolbar_height"
-        android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
         android:gravity="center_vertical">
 
         <Button
             android:id="@+id/btn_send"
-            android:background="@drawable/btn_send_bg"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:background="@drawable/btn_send_bg"
             android:enabled="false"
             android:minWidth="60dp"
-            android:textAllCaps="false"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:text="@string/btn_send" />
+            android:text="@string/btn_send"
+            android:textAllCaps="false" />
 
     </RelativeLayout>
 
@@ -102,5 +102,13 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom"
         android:layout_below="@+id/toolbar" />
+
+    <ViewStub
+        android:id="@+id/stub_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom"
+        android:layout_below="@+id/toolbar"
+        android:layout="@layout/empty_media" />
 
 </RelativeLayout>

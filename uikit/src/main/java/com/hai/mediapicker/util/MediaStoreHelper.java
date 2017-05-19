@@ -37,10 +37,12 @@ public class MediaStoreHelper {
     public static class FetchMediaThread extends Thread {
         WeakReference<Context> contextWeakReference;
         PhotosResultCallback resultCallback;
+        int type;
 
-        public FetchMediaThread(Context context, PhotosResultCallback resultCallback) {
+        public FetchMediaThread(Context context, int type, PhotosResultCallback resultCallback) {
             this.contextWeakReference = new WeakReference<>(context);
             this.resultCallback = resultCallback;
+            this.type = type;
         }
 
         @Override
@@ -48,6 +50,7 @@ public class MediaStoreHelper {
             if (contextWeakReference.get() == null)
                 return;
             ContentResolver contentResolver = contextWeakReference.get().getContentResolver();
+            ArrayList<Cursor> cursorArrayList = new ArrayList<>();
             Cursor videoCursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                     , new String[]{MediaStore.Video.Media._ID,
                             MediaStore.Video.Media.DATA,
@@ -62,6 +65,10 @@ public class MediaStoreHelper {
                     , MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? "
                     , new String[]{"video/mpeg", "video/mp4", "video/3gpp", "video/avi"}
                     , MediaStore.Images.Media.DATE_ADDED + " DESC");
+            if ((GalleryFinal.TYPE_VIDEO & type) == GalleryFinal.TYPE_VIDEO) {
+                cursorArrayList.add(videoCursor);
+            }
+
 
             Cursor imageCursor = contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                     , new String[]{MediaStore.Images.Media._ID,
@@ -76,8 +83,11 @@ public class MediaStoreHelper {
                     , MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? "
                     , new String[]{"image/jpeg", "image/png", "image/jpg"}
                     , MediaStore.Images.Media.DATE_ADDED + " DESC");
-
-            MergeCursor data = new MergeCursor(new Cursor[]{imageCursor, videoCursor});
+            if ((GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE) {
+                cursorArrayList.add(imageCursor);
+            }
+            Cursor[] cursors = cursorArrayList.toArray(new Cursor[cursorArrayList.size()]);
+            MergeCursor data = new MergeCursor(cursors);
             if (data == null) return;
             List<PhotoDirectory> directories = new ArrayList<>();
             if (contextWeakReference.get() == null)
@@ -140,8 +150,9 @@ public class MediaStoreHelper {
             if (photoDirectoryAll.getPhotoPaths().size() > 0) {
                 photoDirectoryAll.setCoverPath(photoDirectoryAll.getPhotoPaths().get(0));
             }
-            directories.add(INDEX_ALL_PHOTOS, photoDirectoryAll);
-            if (!videoDirectoryAll.getPhotos().isEmpty()) {
+            if ((GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE)
+                directories.add(INDEX_ALL_PHOTOS, photoDirectoryAll);
+            if (!videoDirectoryAll.getPhotos().isEmpty() && (GalleryFinal.TYPE_VIDEO & type) == GalleryFinal.TYPE_VIDEO) {
                 videoDirectoryAll.setCoverPath(videoDirectoryAll.getPhotoPaths().get(0));
                 directories.add(INDEX_ALL_PHOTOS + 1, videoDirectoryAll);
             }
@@ -152,8 +163,8 @@ public class MediaStoreHelper {
     }
 
 
-    public static void getPhotoDirs(final FragmentActivity activity, final PhotosResultCallback resultCallback) {
-        new FetchMediaThread(activity, resultCallback).start();
+    public static void getPhotoDirs(final FragmentActivity activity, int type, final PhotosResultCallback resultCallback) {
+        new FetchMediaThread(activity, type, resultCallback).start();
     }
 
 

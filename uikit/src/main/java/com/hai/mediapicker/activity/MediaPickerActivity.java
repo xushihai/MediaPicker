@@ -11,9 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -26,6 +26,7 @@ import com.hai.mediapicker.adapter.PopupDirectoryListAdapter;
 import com.hai.mediapicker.decoration.SpaceItemDecoration;
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.entity.PhotoDirectory;
+import com.hai.mediapicker.util.GalleryFinal;
 import com.hai.mediapicker.util.MediaManager;
 import com.hai.mediapicker.util.MediaStoreHelper;
 import com.hai.mediapicker.view.PopupWindowMenu;
@@ -150,10 +151,11 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         });
 
         MediaManager.getInstance().init();
-        MediaStoreHelper.getPhotoDirs(this, new MediaStoreHelper.PhotosResultCallback() {
+        MediaStoreHelper.getPhotoDirs(this, getIntent().getIntExtra("type", GalleryFinal.TYPE_ALL), new MediaStoreHelper.PhotosResultCallback() {
             @Override
             public void onResultCallback(List<PhotoDirectory> dirs) {
-                dirs.get(0).setSelected(true);
+                if (dirs.size() > 0)
+                    dirs.get(0).setSelected(true);
                 MediaManager.getInstance().setPhotoDirectorys(dirs);
                 runOnUiThread(new Runnable() {
                     @Override
@@ -210,6 +212,11 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
     }
 
     private void directoryChanged() {
+        if (MediaManager.getInstance().getPhotoDirectorys().isEmpty()) {
+            ViewStub emptyStub = ((ViewStub) findViewById(R.id.stub_empty));
+            emptyStub.inflate();
+            return;
+        }
         if (galleryAdapter == null) {
             galleryAdapter = new GalleryAdapter(MediaPickerActivity.this, MediaManager.getInstance().getSelectDirectory());
             galleryAdapter.setImageRecyclerView(imageRecyclerView);

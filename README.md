@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```sh
 	dependencies {
-	        compile 'com.github.xushihai:MediaPicker:v1.1'
+	        compile 'com.github.xushihai:MediaPicker:v1.3'
 	}
 
 ```
@@ -31,14 +31,8 @@ Step 2. Add the dependency
             }
         });
 ```
-```sh
-  GalleryFinal.selectMedias(this, GalleryFinal.TYPE_IMAGE,10, new GalleryFinal.OnSelectMediaListener() {
-            @Override
-            public void onSelected(ArrayList<Photo> photoArrayList) {
- 
-            }
-        });
-```
+
+
 ```sh
     使用EventBus3.0注册，接收选择好的图片和视频列表
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -47,6 +41,18 @@ Step 2. Add the dependency
     }
     
     GalleryFinal.selectMedias(this, 10);
+```
+
+```sh
+  GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath()，10*1000);
+```
+
+```sh
+    使用EventBus3.0注册，接收拍摄好的图片或视频
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void sendMedia(Photo media) {
+         
+    }
 ```
 
 使用了v7兼容包，EventBus,Glide，RecyclerView组件。如果项目中包含了这些组件可以使用exclude将这几个组件排除。
@@ -62,3 +68,6 @@ Step 2. Add the dependency
 [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112114.png)]
 [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112128.png)]
 [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112139.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-06-15-141529.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-06-15-141549.png)]
+[![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-06-15-141606.png)]

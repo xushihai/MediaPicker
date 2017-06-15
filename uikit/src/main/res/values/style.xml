@@ -24,7 +24,10 @@
         <item name="colorPrimaryDark">#232326</item>
     </style>
 
-
+    <style name="CaptureTheme" parent="WxTheme">
+        <!-- Customize your theme here. -->
+       <item name="android:windowFullscreen">true</item>
+    </style>
 
 
     <style name="PopupAnimation" parent="android:Animation">

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="RingProgress">
+        <attr name="progress_color" format="color"/>
+        <attr name="background_color" format="color"/>
+        <attr name="ring_width" format="dimension"/>
+        <attr name="start_angle" format="integer"></attr>
+        <attr name="max" format="integer"></attr>
+        <attr name="progress" format="integer"></attr>
+    </declare-styleable>
+
+</resources>

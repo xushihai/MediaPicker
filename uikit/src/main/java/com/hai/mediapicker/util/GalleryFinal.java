@@ -3,6 +3,7 @@ package com.hai.mediapicker.util;
 import android.content.Context;
 import android.content.Intent;
 
+import com.hai.mediapicker.activity.CaptureActivity;
 import com.hai.mediapicker.activity.MediaPickerActivity;
 import com.hai.mediapicker.entity.Photo;
 
@@ -44,6 +45,29 @@ public class GalleryFinal {
 
     public static void selectMedias(Context context, int maxSum) {
         selectMedias(context, TYPE_ALL, maxSum);
+    }
+
+
+    /**
+     * @param context
+     * @param destnationPath 目录路径，非最终的媒体文件的路径
+     */
+    public static void captureMedia(Context context, String destnationPath) {
+        captureMedia(context, destnationPath, -1);
+    }
+
+    /**
+     * @param context
+     * @param destnationPath 目录路径，非最终的媒体文件的路径
+     * @param maxDuration  单位：毫秒
+     */
+    public static void captureMedia(Context context, String destnationPath, int maxDuration) {
+        Intent intent = new Intent(context, CaptureActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("destnationPath", destnationPath);
+        if (maxDuration > 0)
+            intent.putExtra("maxDuration", maxDuration);
+        context.startActivity(intent);
     }
 
     public interface OnSelectMediaListener {

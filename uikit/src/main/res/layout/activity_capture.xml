@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
+
+
+    <SurfaceView
+        android:id="@+id/surface_capture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <ImageView
+        android:id="@+id/iv_switch"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:clickable="true"
+        android:onClick="switchCamera"
+        android:src="@mipmap/ic_switch_camera" />
+
+
+    <RelativeLayout
+        android:id="@+id/rl_start"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp">
+
+
+        <View
+            android:id="@+id/view_big"
+            android:layout_width="@dimen/circle_normal_size"
+            android:layout_height="@dimen/circle_normal_size"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle_with_221" />
+
+        <com.hai.mediapicker.view.RingProgress
+            android:id="@+id/ring_progress"
+            android:layout_width="@dimen/circle_large_size"
+            android:layout_height="@dimen/circle_large_size"
+            custom:start_angle="-90"
+            custom:background_color="#dddddd"
+            custom:progress_color="#68c067"
+            custom:ring_width="5dp"
+            android:layout_centerInParent="true"/>
+
+        <View
+            android:id="@+id/view_small"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle_with_white" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_decide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="70dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_cancel"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:clickable="true"
+            android:background="@drawable/circle_with_white"
+            android:scaleType="center"
+            android:src="@mipmap/ic_cancel"
+            android:tint="#333333" />
+        <ImageView
+            android:id="@+id/iv_ok"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:clickable="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/circle_with_white"
+            android:scaleType="center"
+            android:src="@mipmap/ic_ok" />
+
+    </RelativeLayout>
+</RelativeLayout>

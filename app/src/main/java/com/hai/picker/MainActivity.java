@@ -29,7 +29,12 @@ public class MainActivity extends Activity {
 //            }
 //        });
 
-        GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath());
+        GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+            @Override
+            public void onSelected(Photo photo) {
+                Log.e("拍摄","拍摄完成："+photo);
+            }
+        });
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void sendMedia(Photo photo) {

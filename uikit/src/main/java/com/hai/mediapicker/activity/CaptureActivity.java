@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
+import com.hai.mediapicker.util.GalleryFinal;
 import com.hai.mediapicker.util.MemoryLeakUtil;
 import com.hai.mediapicker.view.RingProgress;
 
@@ -382,10 +383,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private void takePicture(){
-        if(camera==null)
+    private void takePicture() {
+        if (camera == null)
             return;
-        try{
+        try {
             camera.takePicture(null, null, new Camera.PictureCallback() {
                 @Override
                 public void onPictureTaken(byte[] data, Camera camera) {
@@ -394,7 +395,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                     showDecide();
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -410,8 +411,15 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         photo.setPath(videoPath);
         photo.setSize(new File(videoPath).length());
         photo.setDuration(duration);
-        EventBus.getDefault().post(photo);
+        send(photo);
         finish();
+    }
+
+    private void send(Photo photo) {
+        if (GalleryFinal.mOnCaptureListener != null)
+            GalleryFinal.mOnCaptureListener.onSelected(photo);
+        GalleryFinal.mOnCaptureListener = null;
+        EventBus.getDefault().post(photo);
     }
 
     private void showStart() {
@@ -443,9 +451,9 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             protected void onPostExecute(Photo photo) {
                 super.onPostExecute(photo);
                 CaptureActivity.this.data = null;
-                if (photo != null)
-                    EventBus.getDefault().post(photo);
-                else
+                if (photo != null) {
+                    send(photo);
+                } else
                     Toast.makeText(CaptureActivity.this, "保存照片失败", Toast.LENGTH_SHORT).show();
                 finish();
             }

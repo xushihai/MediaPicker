@@ -55,6 +55,14 @@ Step 2. Add the dependency
     }
 ```
 
+```sh
+    GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+        @Override
+        public void onSelected(Photo photo) {
+            Log.e("拍摄","拍摄完成："+photo);
+        }
+    });
+```
 使用了v7兼容包，EventBus,Glide，RecyclerView组件。如果项目中包含了这些组件可以使用exclude将这几个组件排除。
 ```sh
  exclude group: 'com.android.support', module: 'appcompat-v7'

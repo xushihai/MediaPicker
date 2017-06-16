@@ -14,7 +14,8 @@ import java.util.ArrayList;
  */
 
 public class GalleryFinal {
-    static OnSelectMediaListener mOnSelectMediaListener;
+    public static OnSelectMediaListener mOnSelectMediaListener;
+    public static OnCaptureListener mOnCaptureListener;
     public static final int TYPE_IMAGE = 1;//图片类型
     public static final int TYPE_VIDEO = 2;//视频类型
     public static final int TYPE_ALL = 3;//所有类型
@@ -56,12 +57,26 @@ public class GalleryFinal {
         captureMedia(context, destnationPath, -1);
     }
 
+    public static void captureMedia(Context context, String destnationPath,OnCaptureListener onCaptureListener) {
+        captureMedia(context, destnationPath, -1,onCaptureListener);
+    }
+
     /**
      * @param context
      * @param destnationPath 目录路径，非最终的媒体文件的路径
      * @param maxDuration  单位：毫秒
      */
     public static void captureMedia(Context context, String destnationPath, int maxDuration) {
+        captureMedia(context,destnationPath,maxDuration,null);
+    }
+
+    /**
+     * @param context
+     * @param destnationPath 目录路径，非最终的媒体文件的路径
+     * @param maxDuration  单位：毫秒
+     */
+    public static void captureMedia(Context context, String destnationPath, int maxDuration,OnCaptureListener onCaptureListener) {
+        mOnCaptureListener = onCaptureListener;
         Intent intent = new Intent(context, CaptureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("destnationPath", destnationPath);
@@ -72,5 +87,9 @@ public class GalleryFinal {
 
     public interface OnSelectMediaListener {
         void onSelected(ArrayList<Photo> photoArrayList);
+    }
+
+    public interface OnCaptureListener {
+        void onSelected(Photo photo);
     }
 }

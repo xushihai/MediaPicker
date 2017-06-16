@@ -164,6 +164,7 @@ public class MediaManager {
 
         if (GalleryFinal.mOnSelectMediaListener != null)
             GalleryFinal.mOnSelectMediaListener.onSelected(photoArrayList);
+        GalleryFinal.mOnSelectMediaListener = null;
         EventBus.getDefault().post(photoArrayList);
     }
 

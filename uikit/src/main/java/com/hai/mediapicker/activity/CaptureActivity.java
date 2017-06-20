@@ -347,6 +347,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        GalleryFinal.mOnCaptureListener = null;
         MemoryLeakUtil.fixInputMethodManagerLeak(this);
     }
 
@@ -418,7 +419,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     private void send(Photo photo) {
         if (GalleryFinal.mOnCaptureListener != null)
             GalleryFinal.mOnCaptureListener.onSelected(photo);
-        GalleryFinal.mOnCaptureListener = null;
         EventBus.getDefault().post(photo);
     }
 

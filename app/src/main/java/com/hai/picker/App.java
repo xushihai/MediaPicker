@@ -1,6 +1,7 @@
 package com.hai.picker;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.squareup.leakcanary.LeakCanary;
 
@@ -20,5 +21,11 @@ public class App extends Application {
             return;
         }
         LeakCanary.install(this);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Log.e("进程","低内存了，开始释放内存");
     }
 }

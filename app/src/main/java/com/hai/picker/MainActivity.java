@@ -3,10 +3,12 @@ package com.hai.picker;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.util.GalleryFinal;
+import com.hai.mediapicker.util.MemoryLeakUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -15,6 +17,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,8 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        MemoryLeakUtil.fixInputMethodManagerLeak(this);
+        GalleryFinal.mOnSelectMediaListener = null;
         System.gc();
     }
 

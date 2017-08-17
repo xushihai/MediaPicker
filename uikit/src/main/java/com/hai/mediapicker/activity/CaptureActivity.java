@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -158,10 +159,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            public void surfaceChanged(SurfaceHolder holder, int format, final int width, final int height) {
                 if (holder.getSurface() == null)
                     return;
-                setParam(width, height);
+
             }
 
             @Override
@@ -206,22 +207,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         startPreview(-1);
-        setParam(surfaceView.getMeasuredWidth(), surfaceView.getMeasuredHeight());
-    }
-
-    public void setParam(int width, int height) {
-        if (camera == null)
-            return;
-        android.hardware.Camera.Parameters parameters = camera.getParameters();
-        bestSize = getBestCameraResolution(parameters, new Point(width, height));
-        parameters.setPreviewSize(bestSize.x, bestSize.y);
-        parameters.setPictureSize(bestSize.x, bestSize.y);
-        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
-        camera.setParameters(parameters);
-        camera.stopPreview();
-        camera.startPreview();
-        // camera.autoFocus(null);
     }
 
     public void startPreview(int _cameraId) {
@@ -243,15 +228,31 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         } else
             cameraId = _cameraId;
         try {
+            Log.e(CaptureActivity.class.getSimpleName(), "开始打开摄像头");
             camera = android.hardware.Camera.open(cameraId);
             camera.setDisplayOrientation(90);
             camera.setPreviewDisplay(surfaceView.getHolder());
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            android.hardware.Camera.Parameters parameters = camera.getParameters();
+            bestSize = getBestCameraResolution(parameters, new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
+
+            Point bestPictureSize = getBestCameraResolution(parameters.getSupportedPictureSizes(), new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
+
+            parameters.setPreviewSize(bestSize.x, bestSize.y);
+            parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
+            Log.e(CaptureActivity.class.getSimpleName(), "支持的对焦点模式:" + parameters.getSupportedFocusModes());
+            if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            camera.setParameters(parameters);
             camera.startPreview();
         } catch (Exception e) {
             e.printStackTrace();
+            camera.stopPreview();
+            camera.release();
             camera = null;
         }
-
+        Log.e(CaptureActivity.class.getSimpleName(), "打开摄像头结束");
         if (camera == null) {
             new AlertDialog.Builder(CaptureActivity.this)
                     .setTitle("提示")
@@ -272,6 +273,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         if (camera == null)
             return;
         camera.stopPreview();
+        camera.setPreviewCallback(null);
         camera.release();
         camera = null;
     }
@@ -289,7 +291,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             if (cameraInfo.facing != facing) {
                 stopPreview();
                 startPreview(i);
-                setParam(surfaceView.getMeasuredWidth(), surfaceView.getMeasuredHeight());
                 facing = cameraInfo.facing;
                 cameraId = i;
                 break;
@@ -305,6 +306,23 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         List<android.hardware.Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
 
         for (android.hardware.Camera.Size s : supportedPreviewSizes) {
+            tmp = Math.abs(((float) s.height / (float) s.width) - x_d_y);
+            if (tmp < mindiff) {
+                mindiff = tmp;
+                best = s;
+            }
+        }
+        return new Point(best.width, best.height);
+    }
+
+    private Point getBestCameraResolution(List<android.hardware.Camera.Size> supportedSizes, Point screenResolution) {
+        float tmp = 0f;
+        float mindiff = 100f;
+        float x_d_y = (float) screenResolution.x / (float) screenResolution.y;
+        android.hardware.Camera.Size best = null;
+        for (android.hardware.Camera.Size s : supportedSizes) {
+            if (s.width == 1280 && s.height == 720)
+                return new Point(best.width, best.height);
             tmp = Math.abs(((float) s.height / (float) s.width) - x_d_y);
             if (tmp < mindiff) {
                 mindiff = tmp;
@@ -362,7 +380,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        stopRecord();
+        justStopRecord();
         stopVideo();
         clearVideoFile();
     }
@@ -375,6 +393,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             showStart();
             stopVideo();
             startPreview(cameraId);
+
             clearVideoFile();
         } else if (v.getId() == R.id.iv_ok) {
             if (data != null)
@@ -565,11 +584,11 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private void stopRecord() {
-        if (mMediaRecorder == null)
-            return;
         try {
-            mMediaRecorder.stop();
-            mMediaRecorder.release(); // release the recorder object
+            if (mMediaRecorder != null) {
+                mMediaRecorder.stop();
+                mMediaRecorder.release(); // release the recorder object
+            }
             mMediaRecorder = null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -577,6 +596,20 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         stopPreview();
         showDecide();
         playVideo(videoPath);
+    }
+
+
+    private void justStopRecord() {
+        try {
+            if (mMediaRecorder != null) {
+                mMediaRecorder.stop();
+                mMediaRecorder.release(); // release the recorder object
+            }
+            mMediaRecorder = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        stopPreview();
     }
 
     private void playVideo(String path) {

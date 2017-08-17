@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        MemoryLeakUtil.fixInputMethodManagerLeak(this);
+        //MemoryLeakUtil.fixInputMethodManagerLeak(this);
         GalleryFinal.mOnSelectMediaListener = null;
         System.gc();
     }

@@ -73,6 +73,16 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     int maxDuration = 10 * 1000;//最多只能录视频的时间长度
     RingProgress ringProgress;
     CountDownHandler countDownHandler;
+    Handler handler = new Handler();
+    Runnable captureVideo = new Runnable() {
+        @Override
+        public void run() {
+            Log.e(CaptureActivity.class.getSimpleName(), "开始算为长按，开始拍视频");
+            enlarge();
+            prepareVideoRecorder();
+            countDownHandler.start();
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,20 +132,15 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         rlStart.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Log.e("拍摄", event.getAction() + "");
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         start = System.currentTimeMillis();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (mMediaRecorder == null && (System.currentTimeMillis() - start) > 500) {
-                            Log.e(CaptureActivity.class.getSimpleName(), "开始算为长按，开始拍视频");
-                            enlarge();
-                            prepareVideoRecorder();
-                            countDownHandler.start();
-                        }
+                        handler.postDelayed(captureVideo, 300);
                         break;
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_UP:
+                        handler.removeCallbacks(captureVideo);
                         if (mMediaRecorder == null) {
                             break;
                         }
@@ -228,7 +233,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         } else
             cameraId = _cameraId;
         try {
-            Log.e(CaptureActivity.class.getSimpleName(), "开始打开摄像头");
             camera = android.hardware.Camera.open(cameraId);
             camera.setDisplayOrientation(90);
             camera.setPreviewDisplay(surfaceView.getHolder());
@@ -241,7 +245,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
             parameters.setPreviewSize(bestSize.x, bestSize.y);
             parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
-            Log.e(CaptureActivity.class.getSimpleName(), "支持的对焦点模式:" + parameters.getSupportedFocusModes());
             if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             camera.setParameters(parameters);
@@ -252,7 +255,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             camera.release();
             camera = null;
         }
-        Log.e(CaptureActivity.class.getSimpleName(), "打开摄像头结束");
         if (camera == null) {
             new AlertDialog.Builder(CaptureActivity.this)
                     .setTitle("提示")

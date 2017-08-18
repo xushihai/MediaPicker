@@ -367,6 +367,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        captureVideo = null;
         GalleryFinal.mOnCaptureListener = null;
         MemoryLeakUtil.fixInputMethodManagerLeak(this);
     }

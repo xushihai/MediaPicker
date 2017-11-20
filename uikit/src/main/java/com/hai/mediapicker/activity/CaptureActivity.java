@@ -251,9 +251,11 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             camera.startPreview();
         } catch (Exception e) {
             e.printStackTrace();
-            camera.stopPreview();
-            camera.release();
-            camera = null;
+            if(camera!=null){
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+            }
         }
         if (camera == null) {
             new AlertDialog.Builder(CaptureActivity.this)

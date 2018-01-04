@@ -395,6 +395,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         if (v.getId() == R.id.rl_start) {
             takePicture();
         } else if (v.getId() == R.id.iv_cancel) {
+            data = null;
             showStart();
             stopVideo();
             startPreview(cameraId);
@@ -632,7 +633,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void stopVideo() {
-        if (mediaplayer == null || !mediaplayer.isPlaying()) {
+        if (mediaplayer == null) {
             return;
         }
         try {

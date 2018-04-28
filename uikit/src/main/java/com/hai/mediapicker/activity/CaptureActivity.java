@@ -247,6 +247,8 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
             if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+
+            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             camera.setParameters(parameters);
             camera.startPreview();
         } catch (Exception e) {

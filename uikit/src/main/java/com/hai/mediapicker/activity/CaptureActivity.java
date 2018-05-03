@@ -68,7 +68,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     String videoPath;
     Point bestSize;
     MediaPlayer mediaplayer;
-    View viewBig, viewSmall;
+    View viewBig, viewSmall, viewSave;
     long start;
     int maxDuration = 10 * 1000;//最多只能录视频的时间长度
     RingProgress ringProgress;
@@ -107,6 +107,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         rlDecide = (RelativeLayout) findViewById(R.id.rl_decide);
         rlStart = (RelativeLayout) findViewById(R.id.rl_start);
         viewSmall = findViewById(R.id.view_small);
+        viewSave = findViewById(R.id.iv_save);
         viewBig = findViewById(R.id.view_big);
         ringProgress = (RingProgress) findViewById(R.id.ring_progress);
         countDownHandler = new CountDownHandler(ringProgress, maxDuration, new Runnable() {
@@ -118,6 +119,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         });
         findViewById(R.id.iv_cancel).setOnClickListener(this);
         findViewById(R.id.iv_ok).setOnClickListener(this);
+        viewSave.setOnClickListener(this);
         rlStart.setOnClickListener(this);
 
 
@@ -221,6 +223,20 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
         if (_cameraId == -1) {
             int numberOfCameras = Camera.getNumberOfCameras();
+            if (numberOfCameras == 0) {
+                new AlertDialog.Builder(CaptureActivity.this)
+                        .setTitle(getString(R.string.error_camera_title))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.error_no_camera))
+                        .setPositiveButton(getString(R.string.btn_ok), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .create().show();
+                return;
+            }
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
             for (int i = 0; i < numberOfCameras; i++) {
                 Camera.getCameraInfo(i, cameraInfo);
@@ -253,7 +269,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             camera.startPreview();
         } catch (Exception e) {
             e.printStackTrace();
-            if(camera!=null){
+            if (camera != null) {
                 camera.stopPreview();
                 camera.release();
                 camera = null;
@@ -261,10 +277,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (camera == null) {
             new AlertDialog.Builder(CaptureActivity.this)
-                    .setTitle("提示")
+                    .setTitle(getString(R.string.error_camera_title))
                     .setCancelable(false)
-                    .setMessage("无法获取摄像头数据，请在手机应用权限管理中打开摄像头权限。")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    .setMessage(getString(R.string.error_open_camera))
+                    .setPositiveButton(getString(R.string.btn_ok), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -321,21 +337,34 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         return new Point(best.width, best.height);
     }
 
+
+    /**
+     * 我的选择策略：找到最接近屏幕尺寸的尽量大的哪一个尺寸，如果没有比它大的就选择支持的最大的,
+     *
+     * @param supportedSizes
+     * @param screenResolution
+     * @return
+     */
     private Point getBestCameraResolution(List<android.hardware.Camera.Size> supportedSizes, Point screenResolution) {
-        float tmp = 0f;
-        float mindiff = 100f;
-        float x_d_y = (float) screenResolution.x / (float) screenResolution.y;
-        android.hardware.Camera.Size best = null;
-        for (android.hardware.Camera.Size s : supportedSizes) {
-            if (s.width == 1280 && s.height == 720)
-                return new Point(best.width, best.height);
-            tmp = Math.abs(((float) s.height / (float) s.width) - x_d_y);
-            if (tmp < mindiff) {
-                mindiff = tmp;
-                best = s;
+        Camera.Size bestFitSize = null;
+        if (supportedSizes.size() > 0)
+            bestFitSize = supportedSizes.get(supportedSizes.size() - 1);
+
+        for (int i = supportedSizes.size() - 2; i >= 0; i--) {
+
+            /**本来是应该比较supportedSizes.get(i).width的，但是获取到的尺寸高度是正常的宽度*/
+            if (screenResolution.x <= supportedSizes.get(i).height) {
+                bestFitSize = supportedSizes.get(i);
+            } else {
+                if (bestFitSize == null)
+                    bestFitSize = supportedSizes.get(i);
+                break;
             }
         }
-        return new Point(best.width, best.height);
+        if (bestFitSize == null)
+            return screenResolution;
+
+        return new Point(bestFitSize.width, bestFitSize.height);
     }
 
     private void enlarge() {
@@ -408,7 +437,35 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                 savePictureAsync(data, camera);
             else
                 saveVideo();
+        } else if (v.getId() == R.id.iv_save) {
+            saveMedia();
         }
+    }
+
+
+    private void saveMedia() {
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String file = videoPath;
+                if (data != null) {
+                    try {
+                        Photo photo = savePicture(data, camera);
+                        file = photo.getPath();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return GalleryFinal.getSaver().save(file);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean bool) {
+                super.onPostExecute(bool);
+                Toast.makeText(getApplicationContext(), getString(R.string.toast_save), Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
     }
 
     private void takePicture() {
@@ -453,12 +510,14 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         rlDecide.setVisibility(View.GONE);
         rlStart.setVisibility(View.VISIBLE);
         findViewById(R.id.iv_switch).setVisibility(View.VISIBLE);
+        viewSave.setVisibility(View.INVISIBLE);
     }
 
     public void showDecide() {
         rlDecide.setVisibility(View.VISIBLE);
         rlStart.setVisibility(View.GONE);
         findViewById(R.id.iv_switch).setVisibility(View.GONE);
+        viewSave.setVisibility(View.VISIBLE);
     }
 
     public void savePictureAsync(final byte[] data, final Camera camera) {

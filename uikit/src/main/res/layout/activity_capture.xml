@@ -21,6 +21,15 @@
         android:onClick="switchCamera"
         android:src="@mipmap/ic_switch_camera" />
 
+    <ImageView
+        android:id="@+id/iv_save"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_margin="20dp"
+        android:clickable="true"
+        android:visibility="gone"
+        android:src="@mipmap/ic_save" />
 
     <RelativeLayout
         android:id="@+id/rl_start"

@@ -6,6 +6,8 @@ import android.content.Intent;
 import com.hai.mediapicker.activity.CaptureActivity;
 import com.hai.mediapicker.activity.MediaPickerActivity;
 import com.hai.mediapicker.entity.Photo;
+import com.hai.mediapicker.save.BaseSaver;
+import com.hai.mediapicker.save.ISaver;
 
 import java.util.ArrayList;
 
@@ -19,6 +21,15 @@ public class GalleryFinal {
     public static final int TYPE_IMAGE = 1;//图片类型
     public static final int TYPE_VIDEO = 2;//视频类型
     public static final int TYPE_ALL = 3;//所有类型
+    private static ISaver iSaver = new BaseSaver();
+
+    public static void initSaver(ISaver iSaver) {
+        GalleryFinal.iSaver = iSaver;
+    }
+
+    public static ISaver getSaver(){
+        return iSaver;
+    }
 
     public static void selectMedias(Context context, int type, int maxSum, OnSelectMediaListener onSelectMediaListener) {
         mOnSelectMediaListener = onSelectMediaListener;

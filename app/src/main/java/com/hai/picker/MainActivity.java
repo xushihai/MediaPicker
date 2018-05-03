@@ -1,20 +1,30 @@
 package com.hai.picker;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import android.os.FileUtils;
 import android.util.Log;
 
 import com.hai.mediapicker.entity.Photo;
+import com.hai.mediapicker.save.BaseSaver;
+import com.hai.mediapicker.save.ISaver;
 import com.hai.mediapicker.util.GalleryFinal;
-import com.hai.mediapicker.util.MemoryLeakUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
 
 public class MainActivity extends Activity {
 
@@ -32,13 +42,15 @@ public class MainActivity extends Activity {
 //            }
 //        });
 
+        GalleryFinal.initSaver(new EncryptSaver(this));
         GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
             @Override
             public void onSelected(Photo photo) {
-                Log.e("拍摄","拍摄完成："+photo);
+                Log.e("拍摄", "拍摄完成：" + photo);
             }
         });
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void sendMedia(Photo photo) {
         Log.e("多媒体", photo.toString());
@@ -58,5 +70,45 @@ public class MainActivity extends Activity {
         System.gc();
     }
 
+
+    private static class EncryptSaver implements ISaver {
+        File dir;
+
+        public EncryptSaver(Context context) {
+            dir = new File(context.getFilesDir(), "camera");
+            dir = context.getExternalFilesDir("camera");
+            if (!dir.exists())
+                dir.mkdir();
+            Log.e("文件", dir.getAbsolutePath());
+        }
+
+        @Override
+        public boolean save(String previousFile) {
+            try {
+                File previousFiles = new File(previousFile);
+                File file = new File(dir, previousFiles.getName());
+                Cipher cipher = Cipher.getInstance("DES");
+                KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
+                keyGenerator.init(64, new SecureRandom("dnp123fggfhht".getBytes()));
+                cipher.init(Cipher.ENCRYPT_MODE, keyGenerator.generateKey());
+                CipherOutputStream cipherOutputStream = new CipherOutputStream(new FileOutputStream(file), cipher);
+                int len = -1;
+                byte[] buffer = new byte[4986];
+                FileInputStream fileInputStream = new FileInputStream(previousFiles);
+                while ((len=fileInputStream.read(buffer))!=-1){
+                    cipherOutputStream.write(buffer,0,len);
+                }
+                fileInputStream.close();
+                cipherOutputStream.flush();
+                cipherOutputStream.close();
+                previousFiles.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+
+    }
 
 }

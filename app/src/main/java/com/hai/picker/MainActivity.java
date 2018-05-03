@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.util.Log;
 
 import com.hai.mediapicker.entity.Photo;
-import com.hai.mediapicker.save.BaseSaver;
 import com.hai.mediapicker.save.ISaver;
 import com.hai.mediapicker.util.GalleryFinal;
 
@@ -95,8 +93,8 @@ public class MainActivity extends Activity {
                 int len = -1;
                 byte[] buffer = new byte[4986];
                 FileInputStream fileInputStream = new FileInputStream(previousFiles);
-                while ((len=fileInputStream.read(buffer))!=-1){
-                    cipherOutputStream.write(buffer,0,len);
+                while ((len = fileInputStream.read(buffer)) != -1) {
+                    cipherOutputStream.write(buffer, 0, len);
                 }
                 fileInputStream.close();
                 cipherOutputStream.flush();

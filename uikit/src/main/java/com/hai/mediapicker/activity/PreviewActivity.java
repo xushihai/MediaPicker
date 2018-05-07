@@ -1,9 +1,7 @@
 package com.hai.mediapicker.activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -39,7 +36,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,8 +177,6 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
     }
 
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -203,6 +197,7 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
         public ImageView ivVideoPlay;
         public int viewType;
         String url = "";
+        Photo photo;
 
         public PagerHolder(View itemView) {
             super(itemView);
@@ -221,14 +216,16 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
                     @Override
                     public void onClick(View v) {
                         Context context = v.getContext();
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.parse(url), "video/*");
-                        try {
-                            context.startActivity(intent);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(context, context.getString(R.string.play_video_fail), Toast.LENGTH_SHORT).show();
-                        }
+                        VideoPlayer.playVideo(context, photo);
+
+//                        Intent intent = new Intent(Intent.ACTION_VIEW);
+//                        intent.setDataAndType(Uri.parse(url), "video/*");
+//                        try {
+//                           context.startActivity(intent);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            Toast.makeText(context, context.getString(R.string.play_video_fail), Toast.LENGTH_SHORT).show();
+//                        }
                     }
                 });
             }
@@ -236,6 +233,7 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
 
         public void bindData(Photo photo) {
             url = "file:///" + photo.getPath();
+            this.photo = photo;
             Glide.with(touchImageView.getContext()).load(url)
                     .placeholder(android.R.color.black)
                     .priority(Priority.IMMEDIATE)

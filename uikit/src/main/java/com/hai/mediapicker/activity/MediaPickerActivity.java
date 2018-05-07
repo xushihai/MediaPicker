@@ -2,19 +2,20 @@ package com.hai.mediapicker.activity;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.IWindowManager;
 import android.view.View;
 import android.view.ViewStub;
-import android.view.inputmethod.InputMethodManager;
+import android.view.WindowManagerGlobal;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.PopupWindow;
@@ -36,7 +37,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +62,10 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        GalleryFinal.mOnSelectMediaListener=null;
+        GalleryFinal.mOnSelectMediaListener = null;
         MediaManager.getInstance().removeOnCheckchangeListener(this);
         EventBus.getDefault().unregister(this);
         MediaManager.getInstance().clear();
@@ -141,11 +140,19 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
 
 
     public static int getNavigationBarHeight(Activity activity) {
-        Resources resources = activity.getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height",
-                "dimen", "android");
-        //获取NavigationBar的高度
-        int height = resources.getDimensionPixelSize(resourceId);
+        int height = 0;
+        try {
+            IWindowManager mWindowManagerService = WindowManagerGlobal.getWindowManagerService();
+            if (mWindowManagerService.hasNavigationBar()) {
+                Resources resources = activity.getResources();
+                int resourceId = resources.getIdentifier("navigation_bar_height",
+                        "dimen", "android");
+                //获取NavigationBar的高度
+                height = resources.getDimensionPixelSize(resourceId);
+            }
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        }
         return height;
     }
 
@@ -174,7 +181,6 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         int barHeight = getResources().getDimensionPixelOffset(R.dimen.toolbar_height);
         int windowHeight = getNavigationBarHeight(this) + barHeight;
         menuWindow.showAtLocation(findViewById(R.id.bottom), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, windowHeight);
-
     }
 
     private void directoryChanged() {

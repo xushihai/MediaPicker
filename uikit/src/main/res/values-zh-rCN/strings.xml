@@ -20,4 +20,5 @@
     <string name="error_open_camera">无法获取摄像头数据，请在手机应用权限管理中打开摄像头权限。</string>
     <string name="error_camera_title">提示</string>
     <string name="btn_ok">确定</string>
+    <string name="total_play_error">播放出错</string>
 </resources>

@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -160,10 +161,10 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
             winParams.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
             winParams.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
             getWindow().setAttributes(winParams);
-            getSupportActionBar().hide();
             buttomBar.setVisibility(View.GONE);
             divider.setVisibility(View.GONE);
             btnSend.setVisibility(View.GONE);
+            getSupportActionBar().hide();
         } else {
             WindowManager.LayoutParams winParams = getWindow().getAttributes();
             winParams.flags &= ~WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
@@ -267,7 +268,11 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
         @Override
         protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
             float viewRatio = outWidth * 1.0f / outHeight;
-            if (imageRatio >= viewRatio) {
+
+            /**
+             * ||imageWidth==0有的图片通过查询数据库的方式可能得不到长宽，这个时候默认就用fitcenter方式裁剪图片了
+             */
+            if (imageRatio >= viewRatio || imageWidth == 0) {
                 return TransformationUtils.fitCenter(toTransform, pool, outWidth, outHeight);
             } else {
                 final Bitmap toReuse = pool.get(outWidth, outHeight, toTransform.getConfig() != null

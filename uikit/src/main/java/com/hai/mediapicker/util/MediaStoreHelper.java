@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;

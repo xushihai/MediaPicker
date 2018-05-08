@@ -2,6 +2,7 @@ package com.hai.mediapicker.activity;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -10,6 +11,7 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +61,8 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
     }
 
     private void initUi() {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        fitsSystemWindows(findViewById(R.id.toolbar_layout));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -133,6 +137,25 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
         MediaManager.getInstance().addOnCheckchangeListener(this);
         onCheckedChanged(MediaManager.getInstance().getCheckStatus(), 0, true);
         updateUi(viewPager.getCurrentItem());
+    }
+
+    /**
+     * 状态栏透明后要想一部分View从屏幕顶部开始，一部分View从原来的状态栏开始使用fitsSystemWindows属性实现不了，只好手动实现
+     * @param view
+     */
+    private void fitsSystemWindows(View view){
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        int status_bar_height;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            status_bar_height = getResources().getDimensionPixelSize(resourceId);
+        }else{
+            int statusHeightDp = Build.VERSION.SDK_INT>=Build.VERSION_CODES.M?24:25;
+            status_bar_height = (int) Math.ceil(statusHeightDp * view.getContext().getResources().getDisplayMetrics().density);
+        }
+
+        layoutParams.setMargins(layoutParams.leftMargin,status_bar_height+layoutParams.topMargin,layoutParams.rightMargin,layoutParams.bottomMargin);
+        view.setLayoutParams(layoutParams);
     }
 
     private void updateUi(int position) {

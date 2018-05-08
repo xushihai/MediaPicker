@@ -4,18 +4,21 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.Gravity;
-import android.view.IWindowManager;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewStub;
-import android.view.WindowManagerGlobal;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.PopupWindow;
@@ -138,19 +141,40 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         MediaManager.getInstance().setMaxMediaSum(maxMedia);
     }
 
+    private static boolean hasNavigationBar(Activity context) {
+//        IWindowManager mWindowManagerService = WindowManagerGlobal.getWindowManagerService();
+//            mWindowManagerService.hasNavigationBar()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Display display = context.getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            Point realSize = new Point();
+            display.getSize(size);
+            display.getRealSize(realSize);
+            return realSize.y != size.y;
+        } else {
+            boolean menu = ViewConfiguration.get(context).hasPermanentMenuKey();
+            boolean back = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+            if (menu || back) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
 
     public static int getNavigationBarHeight(Activity activity) {
         int height = 0;
         try {
-            IWindowManager mWindowManagerService = WindowManagerGlobal.getWindowManagerService();
-            if (mWindowManagerService.hasNavigationBar()) {
+            boolean hasNavigationBar = hasNavigationBar(activity);
+            if (hasNavigationBar) {
                 Resources resources = activity.getResources();
                 int resourceId = resources.getIdentifier("navigation_bar_height",
                         "dimen", "android");
                 //获取NavigationBar的高度
                 height = resources.getDimensionPixelSize(resourceId);
             }
-        } catch (RemoteException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return height;

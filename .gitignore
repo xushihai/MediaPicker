@@ -1,6 +1,5 @@
 *.iml
 .gradle
-/local.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
@@ -30,3 +29,7 @@ uikit/build/*
 uikit/uikit.iml
 *.zip
 *.tar.gz
+app/libs/
+app/src/main/res/drawable/
+app/src/main/res/layout/
+uikit/libs/

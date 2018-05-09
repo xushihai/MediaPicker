@@ -12,6 +12,8 @@
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true">
+
+
         <activity
             android:name=".activity.MediaPickerActivity"
             android:label="@string/label_picker_activity"

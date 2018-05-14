@@ -255,7 +255,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
 
         tvPreview.setEnabled(checkSize != 0);
         tvPreview.setText(checkSize == 0 ? getString(R.string.preview) : getString(R.string.preview_multi, checkSize));
-        if (!uiUpdated)
+        if (uiUpdated)
             galleryAdapter.updateCheckbox(changedId);
     }
 

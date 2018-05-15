@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```sh
 	dependencies {
-	        compile 'com.github.xushihai:MediaPicker:v1.32'
+	        compile 'com.github.xushihai:MediaPicker:v1.40'
 	}
 
 ```
@@ -43,8 +43,9 @@ Step 2. Add the dependency
     GalleryFinal.selectMedias(this, 10);
 ```
 
+#拍摄视频接口增加了一个type字段用于选择拍摄照片或者拍摄照片和视频
 ```sh
-  GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath()，10*1000);
+  GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath()，10*1000);
 ```
 
 ```sh
@@ -56,7 +57,7 @@ Step 2. Add the dependency
 ```
 
 ```sh
-    GalleryFinal.captureMedia(this, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+    GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
         @Override
         public void onSelected(Photo photo) {
             Log.e("拍摄","拍摄完成："+photo);

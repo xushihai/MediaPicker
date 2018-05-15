@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.hai.mediapicker.util.GalleryFinal.TYPE_IMAGE;
+
 /**
  * Created by Administrator on 2017/6/12.
  */
@@ -71,6 +73,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     View viewBig, viewSmall, viewSave;
     long start;
     int maxDuration = 10 * 1000;//最多只能录视频的时间长度
+    int type;//拍摄类型
     RingProgress ringProgress;
     CountDownHandler countDownHandler;
     Handler handler = new Handler();
@@ -87,9 +90,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initUi();
+        type = getIntent().getIntExtra("type", GalleryFinal.TYPE_ALL);
         destnationPath = getIntent().getStringExtra("destnationPath");
         maxDuration = getIntent().getIntExtra("maxDuration", 10 * 1000);
+        initUi();
     }
 
     private void initUi() {
@@ -138,11 +142,13 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         start = System.currentTimeMillis();
-                        handler.postDelayed(captureVideo, 300);
+                        if (type != TYPE_IMAGE)
+                            handler.postDelayed(captureVideo, 300);
                         break;
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_UP:
-                        handler.removeCallbacks(captureVideo);
+                        if (type != TYPE_IMAGE)
+                            handler.removeCallbacks(captureVideo);
                         if (mMediaRecorder == null) {
                             break;
                         }

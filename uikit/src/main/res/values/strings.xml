@@ -10,6 +10,7 @@
     <color name="__picker_text_120">#787878</color>
     <string name="__picker_image_count">%1$d</string>
     <string name="image_video">Images &#038; Videos</string>
+    <string name="all_image">All Images</string>
     <string name="all_video">All Videos</string>
 
     <string name="send_multi">Send(%1$d/%2$d)</string>

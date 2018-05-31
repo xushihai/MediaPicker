@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
@@ -94,7 +93,10 @@ public class MediaStoreHelper {
             if (contextWeakReference.get() == null)
                 return;
             PhotoDirectory photoDirectoryAll = new PhotoDirectory();
-            photoDirectoryAll.setName(contextWeakReference.get().getString(R.string.image_video));
+            int photoDirName = R.string.image_video;
+            if (type == GalleryFinal.TYPE_IMAGE)
+                photoDirName = R.string.all_image;
+            photoDirectoryAll.setName(contextWeakReference.get().getString(photoDirName));
             photoDirectoryAll.setId(1);
 
             PhotoDirectory videoDirectoryAll = new PhotoDirectory();
@@ -155,7 +157,8 @@ public class MediaStoreHelper {
                 directories.add(INDEX_ALL_PHOTOS, photoDirectoryAll);
             if (!videoDirectoryAll.getPhotos().isEmpty() && (GalleryFinal.TYPE_VIDEO & type) == GalleryFinal.TYPE_VIDEO) {
                 videoDirectoryAll.setCoverPath(videoDirectoryAll.getPhotoPaths().get(0));
-                directories.add(INDEX_ALL_PHOTOS + 1, videoDirectoryAll);
+                int index = (GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE?INDEX_ALL_PHOTOS + 1:0;
+                directories.add(index, videoDirectoryAll);
             }
             if (resultCallback != null) {
                 resultCallback.onResultCallback(directories);

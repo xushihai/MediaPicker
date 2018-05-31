@@ -4,6 +4,7 @@
     <string name="btn_send">发送</string>
 
     <string name="__picker_image_count">%1$d张</string>
+    <string name="all_image">所有图片</string>
     <string name="image_video">图片和视频</string>
     <string name="all_video">所有视频</string>
 

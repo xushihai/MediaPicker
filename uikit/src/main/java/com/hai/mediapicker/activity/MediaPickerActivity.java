@@ -129,6 +129,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
                     @Override
                     public void run() {
                         directoryChanged();
+                        tvDirectory.setText(MediaManager.getInstance().getPhotoDirectorys().get(0).getName());
                     }
                 });
             }

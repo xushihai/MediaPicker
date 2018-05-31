@@ -27,7 +27,7 @@ public class GalleryFinal {
         GalleryFinal.iSaver = iSaver;
     }
 
-    public static ISaver getSaver(){
+    public static ISaver getSaver() {
         return iSaver;
     }
 
@@ -65,31 +65,41 @@ public class GalleryFinal {
      * @param destnationPath 目录路径，非最终的媒体文件的路径
      */
     public static void captureMedia(Context context, String destnationPath) {
-        captureMedia(context, destnationPath, -1);
+        captureMedia(context, TYPE_ALL, destnationPath, -1);
     }
 
-    public static void captureMedia(Context context, String destnationPath,OnCaptureListener onCaptureListener) {
-        captureMedia(context, destnationPath, -1,onCaptureListener);
+    public static void captureMedia(Context context, int type, String destnationPath) {
+        captureMedia(context, type, destnationPath, -1);
     }
 
-    /**
-     * @param context
-     * @param destnationPath 目录路径，非最终的媒体文件的路径
-     * @param maxDuration  单位：毫秒
-     */
-    public static void captureMedia(Context context, String destnationPath, int maxDuration) {
-        captureMedia(context,destnationPath,maxDuration,null);
+    public static void captureMedia(Context context, int type, String destnationPath, OnCaptureListener onCaptureListener) {
+        captureMedia(context, type, destnationPath, -1, onCaptureListener);
     }
 
     /**
      * @param context
-     * @param destnationPath 目录路径，非最终的媒体文件的路径
-     * @param maxDuration  单位：毫秒
+     * @param type
+     * @param destnationPath
+     * @param maxDuration
      */
-    public static void captureMedia(Context context, String destnationPath, int maxDuration,OnCaptureListener onCaptureListener) {
+    public static void captureMedia(Context context, int type, String destnationPath, int maxDuration) {
+        captureMedia(context, type, destnationPath, maxDuration, null);
+    }
+
+    /**
+     * @param context
+     * @param type:TYPE_IMAGE,TYPE_ALL 只能选择图片或者图片和视频都可以的
+     * @param destnationPath
+     * @param maxDuration
+     * @param onCaptureListener
+     */
+    public static void captureMedia(Context context, int type, String destnationPath, int maxDuration, OnCaptureListener onCaptureListener) {
         mOnCaptureListener = onCaptureListener;
         Intent intent = new Intent(context, CaptureActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (type != TYPE_IMAGE)
+            type = TYPE_ALL;
+        intent.putExtra("type", type);
         intent.putExtra("destnationPath", destnationPath);
         if (maxDuration > 0)
             intent.putExtra("maxDuration", maxDuration);

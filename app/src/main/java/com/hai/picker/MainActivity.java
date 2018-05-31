@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 //        GalleryFinal.selectMedias(this, 10);
         EventBus.getDefault().register(this);
 
-        GalleryFinal.selectMedias(this, GalleryFinal.TYPE_IMAGE, 10, new GalleryFinal.OnSelectMediaListener() {
+        GalleryFinal.selectMedias(this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
             @Override
             public void onSelected(ArrayList<Photo> photoArrayList) {
 

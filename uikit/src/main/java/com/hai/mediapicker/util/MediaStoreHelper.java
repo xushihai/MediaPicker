@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
@@ -147,6 +148,8 @@ public class MediaStoreHelper {
             Collections.sort(photoDirectoryAll.getPhotos(), new Comparator<Photo>() {
                 @Override
                 public int compare(Photo lhs, Photo rhs) {
+                    if(lhs.getAdddate() == rhs.getAdddate())
+                        return 0;
                     return lhs.getAdddate() >= rhs.getAdddate() ? -1 : 1;//按照添加时间进行降序排序
                 }
             });

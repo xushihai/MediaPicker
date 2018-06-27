@@ -245,11 +245,15 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             }
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
             for (int i = 0; i < numberOfCameras; i++) {
-                Camera.getCameraInfo(i, cameraInfo);
-                if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                    facing = cameraInfo.facing;
-                    cameraId = i;
-                    break;
+                try {
+                    Camera.getCameraInfo(i, cameraInfo);
+                    if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                        facing = cameraInfo.facing;
+                        cameraId = i;
+                        break;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();//为了防止有人将手机上的摄像头暴力拆除，导致读取摄像头数量正确，调用getCameraInfo来获取摄像头信息抛出异常
                 }
             }
         } else

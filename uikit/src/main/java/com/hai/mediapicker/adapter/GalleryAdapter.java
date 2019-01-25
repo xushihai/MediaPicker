@@ -18,6 +18,7 @@ import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.entity.PhotoDirectory;
 import com.hai.mediapicker.util.MediaManager;
 import com.hai.mediapicker.viewholder.GalleryHolder;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -31,10 +32,19 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
     private LayoutInflater layoutInflater;
     private AdapterView.OnItemClickListener onItemClickListener;
     private RecyclerView imageRecyclerView;
+    private boolean selectMode = true;
 
     public GalleryAdapter(Activity activity, PhotoDirectory images) {
         this.images = images;
         layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public boolean isSelectMode() {
+        return selectMode;
+    }
+
+    public void setSelectMode(boolean selectMode) {
+        this.selectMode = selectMode;
     }
 
     public void setImageRecyclerView(RecyclerView imageRecyclerView) {
@@ -69,18 +79,20 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
 
     @Override
     public void onBindViewHolder(final GalleryHolder holder, final int position) {
+        if (!selectMode)
+            holder.appCompatCheckBox.setVisibility(View.GONE);
 
         final Photo photo = images.getPhotos().get(position);
         String url = "file:///" + photo.getPath();
         boolean check = MediaManager.getInstance().exsit(photo.getId());
         holder.thumbIv.justSetShowShade(check);
-        //ImageLoader.getInstance().displayImage(url, holder.thumbIv);
-        Glide.with(holder.thumbIv.getContext()).load(url)
-                .placeholder(android.R.color.black)
-                .priority(Priority.IMMEDIATE)
-                .fitCenter()
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                .into(holder.thumbIv);
+        ImageLoader.getInstance().displayImage(url, holder.thumbIv);
+//        Glide.with(holder.thumbIv.getContext()).load(url)
+//                .placeholder(android.R.color.black)
+//                .priority(Priority.IMMEDIATE)
+//                .fitCenter()
+//                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+//                .into(holder.thumbIv);
         holder.appCompatCheckBox.setChecked(check);
         if (photo.getMimetype().contains("video")) {
             holder.tvVideoDuration.setText(converDuration(photo.getDuration()));
@@ -96,7 +108,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                         holder.thumbIv.setShowShade(true);
                     } else {
                         holder.appCompatCheckBox.setChecked(false);
-                        Toast.makeText(v.getContext(), String.format(v.getContext().getResources().getString(R.string.select_max_sum),MediaManager.getInstance().getMaxMediaSum()), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(), String.format(v.getContext().getResources().getString(R.string.select_max_sum), MediaManager.getInstance().getMaxMediaSum()), Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     MediaManager.getInstance().removeMedia(photo.getId(), true);

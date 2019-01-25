@@ -24,10 +24,17 @@
         </activity>
 
         <activity
+            android:name=".activity.AlbumActivity"
+            android:label="@string/label_picker_activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/WxTheme"/>
+
+        <activity
             android:name=".activity.PreviewActivity"
             android:label="@string/label_picker_activity"
             android:screenOrientation="portrait"
             android:theme="@style/WxTheme" />
+
         <activity
             android:name=".activity.CaptureActivity"
             android:screenOrientation="portrait"

@@ -39,7 +39,8 @@ public class BaseSaver implements ISaver {
             if (destFile.exists())
                 destFile.delete();
             copyToFile(new FileInputStream(preFile), destFile);
-            preFile.delete();
+
+            //preFile.delete();  //取消删除拍摄的照片或视频，避免保存后再发送的时候文件已经不存在了（主要是影响的视频）
         } catch (Exception e) {
             e.printStackTrace();
             return false;

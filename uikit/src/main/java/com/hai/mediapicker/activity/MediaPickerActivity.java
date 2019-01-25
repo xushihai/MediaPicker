@@ -49,6 +49,8 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
     GalleryAdapter galleryAdapter;
     Button btnSend;
     TextView tvPreview, tvDirectory;
+    static protected boolean selectMode = true;
+    public static final String EXTREA_SELECT_MODE = "select_mode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         MemoryLeakUtil.fixInputMethodManagerLeak(this);
     }
 
-    private void initUi() {
+    protected void initUi() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         assert toolbar != null;
@@ -114,6 +116,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getBaseContext(), PreviewActivity.class);
+                intent.putExtra(EXTREA_SELECT_MODE,selectMode);
                 startActivity(intent);
             }
         });
@@ -136,7 +139,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         });
     }
 
-    private void readIntentParams() {
+    protected void readIntentParams() {
         Intent intent = getIntent();
         int maxMedia = intent.getIntExtra("maxSum", 9);
         MediaManager.getInstance().setMaxMediaSum(maxMedia);
@@ -217,6 +220,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         if (galleryAdapter == null) {
             galleryAdapter = new GalleryAdapter(MediaPickerActivity.this, MediaManager.getInstance().getSelectDirectory());
             galleryAdapter.setImageRecyclerView(imageRecyclerView);
+            galleryAdapter.setSelectMode(selectMode);
             imageRecyclerView.setAdapter(galleryAdapter);
             MediaManager.getInstance().addOnCheckchangeListener(MediaPickerActivity.this);
             galleryAdapter.setOnItemClickListener(new GalleryItemClickImpl());
@@ -236,6 +240,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             Intent intent = new Intent(view.getContext(), PreviewActivity.class);
             intent.putExtra("index", position);
             intent.putExtra("dir", MediaManager.getInstance().getSelectIndex());
+            intent.putExtra(EXTREA_SELECT_MODE,selectMode);
             view.getContext().startActivity(intent);
         }
     }

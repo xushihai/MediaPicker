@@ -11,6 +11,7 @@ import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,6 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.TransformationUtils;
@@ -32,6 +30,11 @@ import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.util.MediaManager;
 import com.hai.mediapicker.util.MemoryLeakUtil;
 import com.hai.mediapicker.view.TouchImageView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.LoadedFrom;
+import com.nostra13.universalimageloader.core.display.BitmapDisplayer;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -72,6 +75,7 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         buttomBar = findViewById(R.id.bottom);
         divider = findViewById(R.id.bar_divider);
         btnSend = (Button) findViewById(R.id.btn_send);
@@ -81,6 +85,12 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
                 MediaManager.getInstance().send();
             }
         });
+
+        boolean selectMode = getIntent().getBooleanExtra(MediaPickerActivity.EXTREA_SELECT_MODE, true);
+        if (!selectMode)
+            switchOverlay("");
+
+
         rbOriginal = (RadioButton) findViewById(R.id.rb_original);
         cbSelect = (AppCompatCheckBox) findViewById(R.id.cb_pre);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -222,8 +232,9 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
         public int viewType;
         String url = "";
         Photo photo;
+        DisplayImageOptions displayImageOptions;
 
-        public PagerHolder(View itemView) {
+        public PagerHolder(final View itemView) {
             super(itemView);
             touchImageView = (TouchImageView) itemView.findViewById(R.id.iv_touch);
             ivVideoPlay = (ImageView) itemView.findViewById(R.id.iv_play);
@@ -253,17 +264,44 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
                     }
                 });
             }
+
+            displayImageOptions = new DisplayImageOptions.Builder()
+                    .displayer(new BitmapDisplayer() {
+
+                        @Override
+                        public void display(Bitmap bitmap, ImageAware imageAware, LoadedFrom loadedFrom) {
+                            float viewRatio = itemView.getWidth() * 1.0f / itemView.getHeight();
+                            float imageRatio = bitmap.getWidth() * 1.0f / bitmap.getHeight();
+                            if (imageRatio >= viewRatio) {
+                                imageAware.setImageBitmap(bitmap);
+                            } else {
+                                int destHeight = (int) (bitmap.getHeight() * (itemView.getWidth() * 1.0f / bitmap.getWidth()));
+                                Log.e("xx",itemView.getWidth()+"   " +destHeight);
+                              //  destHeight = displayHeight;
+                                if (itemView.getWidth() == 0 || destHeight == 0) {
+                                    imageAware.setImageBitmap(bitmap);
+                                    return;
+                                }
+                                Bitmap transformed = Bitmap.createScaledBitmap(bitmap, itemView.getWidth(), destHeight, false);
+                                imageAware.setImageBitmap(transformed);
+                            }
+                        }
+                    })
+                    .build();
         }
 
         public void bindData(Photo photo) {
             url = "file:///" + photo.getPath();
             this.photo = photo;
-            Glide.with(touchImageView.getContext()).load(url)
-                    .placeholder(android.R.color.black)
-                    .priority(Priority.IMMEDIATE)
-                    .transform(new FitOrCenterBitmapTransformation(touchImageView.getContext(), photo.getWidth(), photo.getHeight()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .into(touchImageView);
+//            Glide.with(touchImageView.getContext()).load(url)
+//                    .placeholder(android.R.color.black)
+//                    .priority(Priority.IMMEDIATE)
+//                    .transform(new FitOrCenterBitmapTransformation(touchImageView.getContext(), photo.getWidth(), photo.getHeight()))
+//                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                    .into(touchImageView);
+
+
+            ImageLoader.getInstance().displayImage(url, touchImageView, displayImageOptions);
 
         }
     }

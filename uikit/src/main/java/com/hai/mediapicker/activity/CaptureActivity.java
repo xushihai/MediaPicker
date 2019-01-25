@@ -504,7 +504,8 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         photo.setFullImage(false);
         photo.setMimetype("video/mp4");
         photo.setPath(videoPath);
-        photo.setSize(new File(videoPath).length());
+        long length = new File(videoPath).exists()?new File(videoPath).length():0;
+        photo.setSize(length);
         photo.setDuration(duration);
         send(photo);
         finish();

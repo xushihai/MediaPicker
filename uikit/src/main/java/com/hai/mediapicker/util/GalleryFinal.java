@@ -3,6 +3,7 @@ package com.hai.mediapicker.util;
 import android.content.Context;
 import android.content.Intent;
 
+import com.hai.mediapicker.activity.AlbumActivity;
 import com.hai.mediapicker.activity.CaptureActivity;
 import com.hai.mediapicker.activity.MediaPickerActivity;
 import com.hai.mediapicker.entity.Photo;
@@ -54,6 +55,31 @@ public class GalleryFinal {
             intent.putExtra("type", type);
         context.startActivity(intent);
     }
+
+    /**
+     * 自己提供数据供查看
+     * @param context
+     * @param maxSum
+     * @param photoArrayList
+     */
+    public static void selectMedias(Context context, int maxSum, ArrayList<Photo> photoArrayList) {
+        mOnSelectMediaListener = null;
+        Intent intent = new Intent(context, AlbumActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("maxSum", maxSum);
+        intent.putExtra(AlbumActivity.EXTREA_PHOTOS, photoArrayList);
+        context.startActivity(intent);
+    }
+
+    public static void showMedias(Context context,  ArrayList<Photo> photoArrayList) {
+        mOnSelectMediaListener = null;
+        Intent intent = new Intent(context, AlbumActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(AlbumActivity.EXTREA_PHOTOS, photoArrayList);
+        intent.putExtra(AlbumActivity.EXTREA_SELECT_MODE, false);
+        context.startActivity(intent);
+    }
+
 
     public static void selectMedias(Context context, int maxSum) {
         selectMedias(context, TYPE_ALL, maxSum);

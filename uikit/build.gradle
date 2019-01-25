@@ -6,10 +6,10 @@ android {
     buildToolsVersion "25.0.0"
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 22
-        versionCode 19
-        versionName "2.2"
+        versionCode 20
+        versionName "2.3"
 
     }
     buildTypes {
@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.+'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 }

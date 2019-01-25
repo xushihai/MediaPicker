@@ -1,9 +1,17 @@
 package com.hai.picker;
 
 import android.app.Application;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.squareup.leakcanary.LeakCanary;
+
+import static android.os.Environment.DIRECTORY_PICTURES;
 
 /**
  * Created by Administrator on 2017/3/17.
@@ -21,6 +29,19 @@ public class App extends Application {
             return;
         }
         LeakCanary.install(this);
+
+
+
+        DisplayImageOptions displayImageOptions = new DisplayImageOptions.Builder()
+//                .showImageOnLoading(new ColorDrawable(Color.parseColor("#EEEEEE")))
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .build();
+
+        ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(this)
+                .defaultDisplayImageOptions(displayImageOptions)
+                .build();
+        ImageLoader.getInstance().init(imageLoaderConfiguration);
     }
 
     @Override

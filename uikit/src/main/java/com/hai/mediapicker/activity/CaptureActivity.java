@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.CamcorderProfile;
@@ -127,11 +128,19 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         rlStart.setOnClickListener(this);
 
 
-        surfaceView.setOnClickListener(new View.OnClickListener() {
+//        surfaceView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (camera != null)
+//                    camera.autoFocus(null);
+//            }
+//        });
+
+        surfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if (camera != null)
-                    camera.autoFocus(null);
+            public boolean onTouch(View v, MotionEvent event) {
+                focusOnTouch((int) event.getX(), (int) event.getY());
+                return false;
             }
         });
 
@@ -222,6 +231,44 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         startPreview(-1);
     }
 
+
+    protected void focusOnRect(Rect rect) {
+        if (camera != null) {
+            try {
+                Camera.Parameters parameters = camera.getParameters(); // 先获取当前相机的参数配置对象
+                if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO); // 设置聚焦模式
+
+                if (parameters.getMaxNumFocusAreas() > 0) {
+                    List<Camera.Area> focusAreas = new ArrayList<Camera.Area>();
+                    focusAreas.add(new Camera.Area(rect, 1000));
+                    parameters.setFocusAreas(focusAreas);
+                }
+                camera.cancelAutoFocus(); // 先要取消掉进程中所有的聚焦功能
+                camera.setParameters(parameters); // 一定要记得把相应参数设置给相机
+                camera.autoFocus(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private void focusOnTouch(int x, int y) {
+        Rect rect = new Rect(x - 100, y - 100, x + 100, y + 100);
+        int left = rect.left * 2000 / surfaceView.getWidth() - 1000;
+        int top = rect.top * 2000 / surfaceView.getHeight() - 1000;
+        int right = rect.right * 2000 / surfaceView.getWidth() - 1000;
+        int bottom = rect.bottom * 2000 / surfaceView.getHeight() - 1000;
+        // 如果超出了(-1000,1000)到(1000, 1000)的范围，则会导致相机崩溃
+        left = left < -1000 ? -1000 : left;
+        top = top < -1000 ? -1000 : top;
+        right = right > 1000 ? 1000 : right;
+        bottom = bottom > 1000 ? 1000 : bottom;
+        focusOnRect(new Rect(left, top, right, bottom));
+    }
+
+
     public void startPreview(int _cameraId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -252,7 +299,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                         cameraId = i;
                         break;
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();//为了防止有人将手机上的摄像头暴力拆除，导致读取摄像头数量正确，调用getCameraInfo来获取摄像头信息抛出异常
                 }
             }
@@ -504,7 +551,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         photo.setFullImage(false);
         photo.setMimetype("video/mp4");
         photo.setPath(videoPath);
-        long length = new File(videoPath).exists()?new File(videoPath).length():0;
+        long length = new File(videoPath).exists() ? new File(videoPath).length() : 0;
         photo.setSize(length);
         photo.setDuration(duration);
         send(photo);

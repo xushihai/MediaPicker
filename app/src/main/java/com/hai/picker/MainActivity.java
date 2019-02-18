@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -42,31 +43,31 @@ public class MainActivity extends Activity {
 //        });
 
         GalleryFinal.initSaver(new EncryptSaver(this));
-//        GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
-//            @Override
-//            public void onSelected(Photo photo) {
-//                Log.e("拍摄", "拍摄完成：" + photo);
-//            }
-//        });
+        GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+            @Override
+            public void onSelected(Photo photo) {
+                Log.e("拍摄", "拍摄完成：" + photo);
+            }
+        });
 
 
 
-        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null, null, null, null);
-        ArrayList<Photo> photoArrayList = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            Photo photo = new Photo();
-            photo.setAdddate(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_ADDED)));
-            photo.setHeight(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)));
-            photo.setWidth(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)));
-            photo.setId(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID)));
-            photo.setSize(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
-            photo.setPath(cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)));
-            photo.setMimetype(cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
-            photoArrayList.add(photo);
-        }
-        cursor.close();
-        GalleryFinal.showMedias(this,photoArrayList);
+//        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, null, null, null);
+//        ArrayList<Photo> photoArrayList = new ArrayList<>();
+//        while (cursor.moveToNext()) {
+//            Photo photo = new Photo();
+//            photo.setAdddate(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATE_ADDED)));
+//            photo.setHeight(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.HEIGHT)));
+//            photo.setWidth(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.WIDTH)));
+//            photo.setId(cursor.getInt(cursor.getColumnIndex(MediaStore.Images.ImageColumns.BUCKET_ID)));
+//            photo.setSize(cursor.getLong(cursor.getColumnIndex(MediaStore.Images.ImageColumns.SIZE)));
+//            photo.setPath(cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)));
+//            photo.setMimetype(cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.MIME_TYPE)));
+//            photoArrayList.add(photo);
+//        }
+//        cursor.close();
+//        GalleryFinal.showMedias(this,photoArrayList);
     }
 
 

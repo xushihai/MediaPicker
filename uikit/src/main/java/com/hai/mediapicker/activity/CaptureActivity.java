@@ -676,7 +676,21 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             this.mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             this.mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             this.mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            CamcorderProfile localObject = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
+            CamcorderProfile localObject = null;
+
+            int[] camcorderQuality = {CamcorderProfile.QUALITY_1080P,CamcorderProfile.QUALITY_720P,CamcorderProfile.QUALITY_480P,CamcorderProfile.QUALITY_LOW};
+            for (int quality:
+                 camcorderQuality) {
+                if(CamcorderProfile.hasProfile(cameraId,quality)){
+                    localObject = CamcorderProfile.get(quality);
+                    break;
+                }
+            }
+
+            if(localObject==null){
+                return false;
+            }
+
             File dir = new File(destnationPath);
             if (!dir.exists())
                 dir.mkdirs();
@@ -738,6 +752,8 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void playVideo(String path) {
+        if(path==null)
+            return;
         try {
             mediaplayer = new MediaPlayer();
             mediaplayer.setAudioStreamType(AudioManager.STREAM_MUSIC);

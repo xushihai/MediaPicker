@@ -199,7 +199,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                 stopPreview();
             }
         });
-
+        facing = GalleryFinal.isSelfie()?Camera.CameraInfo.CAMERA_FACING_FRONT:Camera.CameraInfo.CAMERA_FACING_BACK;
         checkPermission();
     }
 
@@ -294,7 +294,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             for (int i = 0; i < numberOfCameras; i++) {
                 try {
                     Camera.getCameraInfo(i, cameraInfo);
-                    if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    if (cameraInfo.facing == facing) {
                         facing = cameraInfo.facing;
                         cameraId = i;
                         break;
@@ -318,10 +318,14 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
             parameters.setPreviewSize(bestSize.x, bestSize.y);
             parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
+
             if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
 
-            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+//            if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+//            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+
+
             camera.setParameters(parameters);
             camera.startPreview();
         } catch (Exception e) {

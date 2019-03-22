@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
 //
 //            }
 //        });
-
+        GalleryFinal.setDefaultSelfie(true);
         GalleryFinal.initSaver(new EncryptSaver(this));
         GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
             @Override

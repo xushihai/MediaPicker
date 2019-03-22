@@ -24,6 +24,8 @@ public class GalleryFinal {
     public static final int TYPE_ALL = 3;//所有类型
     private static ISaver iSaver = new BaseSaver();
 
+    private static boolean isSelfie = false;//默认是否进来就是自拍模式
+
     public static void initSaver(ISaver iSaver) {
         GalleryFinal.iSaver = iSaver;
     }
@@ -85,6 +87,14 @@ public class GalleryFinal {
         selectMedias(context, TYPE_ALL, maxSum);
     }
 
+
+    public static boolean isSelfie() {
+        return isSelfie;
+    }
+
+    public static void setDefaultSelfie(boolean isSelfie) {
+        GalleryFinal.isSelfie = isSelfie;
+    }
 
     /**
      * @param context

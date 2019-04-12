@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -199,7 +200,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                 stopPreview();
             }
         });
-        facing = GalleryFinal.isSelfie()?Camera.CameraInfo.CAMERA_FACING_FRONT:Camera.CameraInfo.CAMERA_FACING_BACK;
+        facing = GalleryFinal.isSelfie() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
         checkPermission();
     }
 
@@ -269,6 +270,55 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+    private int getCameraDisplayOrientation(int cameraId) {
+        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+        if (cameraInfo == null)
+            return 90;
+
+
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+        int result;
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (cameraInfo.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (cameraInfo.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+
+    public Camera.CameraInfo getCameraInfo(int cameraId) {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            try {
+                Camera.getCameraInfo(i, cameraInfo);
+                if (cameraInfo.facing == facing) {
+                    return cameraInfo;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();//为了防止有人将手机上的摄像头暴力拆除，导致读取摄像头数量正确，调用getCameraInfo来获取摄像头信息抛出异常
+            }
+        }
+        return null;
+    }
+
+
     public void startPreview(int _cameraId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -307,7 +357,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             cameraId = _cameraId;
         try {
             camera = android.hardware.Camera.open(cameraId);
-            camera.setDisplayOrientation(90);
+
+
+            int ori = getCameraDisplayOrientation(cameraId);
+            camera.setDisplayOrientation(ori);
             camera.setPreviewDisplay(surfaceView.getHolder());
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -682,16 +735,16 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             this.mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             CamcorderProfile localObject = null;
 
-            int[] camcorderQuality = {CamcorderProfile.QUALITY_1080P,CamcorderProfile.QUALITY_720P,CamcorderProfile.QUALITY_480P,CamcorderProfile.QUALITY_LOW};
-            for (int quality:
-                 camcorderQuality) {
-                if(CamcorderProfile.hasProfile(cameraId,quality)){
+            int[] camcorderQuality = {CamcorderProfile.QUALITY_1080P, CamcorderProfile.QUALITY_720P, CamcorderProfile.QUALITY_480P, CamcorderProfile.QUALITY_LOW};
+            for (int quality :
+                    camcorderQuality) {
+                if (CamcorderProfile.hasProfile(cameraId, quality)) {
                     localObject = CamcorderProfile.get(quality);
                     break;
                 }
             }
 
-            if(localObject==null){
+            if (localObject == null) {
                 return false;
             }
 
@@ -756,7 +809,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void playVideo(String path) {
-        if(path==null)
+        if (path == null)
             return;
         try {
             mediaplayer = new MediaPlayer();

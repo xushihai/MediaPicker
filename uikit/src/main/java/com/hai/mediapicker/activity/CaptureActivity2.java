@@ -4,7 +4,11 @@ import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -16,22 +20,23 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.android.cameraview.Camera1;
-import com.google.android.cameraview.CameraView;
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.util.GalleryFinal;
@@ -58,10 +63,9 @@ import static com.hai.mediapicker.util.GalleryFinal.TYPE_IMAGE;
  * Created by Administrator on 2017/6/12.
  */
 
-public class CaptureActivity extends AppCompatActivity implements View.OnClickListener {
-    android.hardware.Camera camera;
+public class CaptureActivity2 extends AppCompatActivity implements View.OnClickListener {
+    Camera camera;
     SurfaceView surfaceView;
-    CameraView cameraView;
     int facing = Camera.CameraInfo.CAMERA_FACING_BACK, cameraId;
     String destnationPath;
     RelativeLayout rlStart, rlDecide;
@@ -80,7 +84,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     Runnable captureVideo = new Runnable() {
         @Override
         public void run() {
-            Log.e(CaptureActivity.class.getSimpleName(), "开始算为长按，开始拍视频");
+            Log.e(CaptureActivity2.class.getSimpleName(), "开始算为长按，开始拍视频");
             enlarge();
             prepareVideoRecorder();
             countDownHandler.start();
@@ -102,13 +106,12 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         winParams.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
         getWindow().setAttributes(winParams);
 
-        setContentView(R.layout.activity_capture);
-        cameraView = (CameraView) findViewById(R.id.camera_view);
-        cameraView.setFocusableInTouchMode(true);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            cameraView.setSecure(true);
-//        }
+        setContentView(R.layout.activity_capture2);
         surfaceView = (SurfaceView) findViewById(R.id.surface_capture);
+        surfaceView.setFocusableInTouchMode(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            surfaceView.setSecure(true);
+        }
         rlDecide = (RelativeLayout) findViewById(R.id.rl_decide);
         rlStart = (RelativeLayout) findViewById(R.id.rl_start);
         viewSmall = findViewById(R.id.view_small);
@@ -136,7 +139,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 //            }
 //        });
 
-        cameraView.setOnTouchListener(new View.OnTouchListener() {
+        surfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 focusOnTouch((int) event.getX(), (int) event.getY());
@@ -179,27 +182,33 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        cameraView.addCallback(new CameraView.Callback() {
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
-            public void onPictureTaken(CameraView cameraView, byte[] data) {
-                super.onPictureTaken(cameraView, data);
-                CaptureActivity.this.data = data;
-                //stopPreview();
-                showDecide();
+            public void surfaceChanged(SurfaceHolder holder, int format, final int width, final int height) {
+                if (holder.getSurface() == null)
+                    return;
 
             }
-        });
-        camera = ((Camera1) cameraView.getImpl()).getCamera();
 
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                holder.setKeepScreenOn(true);
+                holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+                startPreview(-1);
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                stopPreview();
+            }
+        });
         facing = GalleryFinal.isSelfie() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
-        cameraView.setFacing(facing != CameraView.FACING_FRONT ? CameraView.FACING_BACK : CameraView.FACING_FRONT);
         checkPermission();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private void checkPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            startPreview();
             return;
         }
         String[] permissions = {
@@ -216,16 +225,13 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (!needRequestPermission.isEmpty()) {
             requestPermissions(needRequestPermission.toArray(new String[needRequestPermission.size()]), 11);
-        } else {
-            startPreview();
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        startPreview();
+        startPreview(-1);
     }
 
 
@@ -253,10 +259,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
 
     private void focusOnTouch(int x, int y) {
         Rect rect = new Rect(x - 100, y - 100, x + 100, y + 100);
-        int left = rect.left * 2000 / cameraView.getWidth() - 1000;
-        int top = rect.top * 2000 / cameraView.getHeight() - 1000;
-        int right = rect.right * 2000 / cameraView.getWidth() - 1000;
-        int bottom = rect.bottom * 2000 / cameraView.getHeight() - 1000;
+        int left = rect.left * 2000 / surfaceView.getWidth() - 1000;
+        int top = rect.top * 2000 / surfaceView.getHeight() - 1000;
+        int right = rect.right * 2000 / surfaceView.getWidth() - 1000;
+        int bottom = rect.bottom * 2000 / surfaceView.getHeight() - 1000;
         // 如果超出了(-1000,1000)到(1000, 1000)的范围，则会导致相机崩溃
         left = left < -1000 ? -1000 : left;
         top = top < -1000 ? -1000 : top;
@@ -265,15 +271,172 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         focusOnRect(new Rect(left, top, right, bottom));
     }
 
-    public void startPreview() {
+
+    private int getCameraDisplayOrientation(int cameraId) {
+        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+        if (cameraInfo == null)
+            return 90;
+
+
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0://竖屏，摄像头那边朝上
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90://横屏，摄像头那边朝左
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180://竖屏，摄像头那边朝下
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270://横屏，摄像头那边朝右
+                degrees = 270;
+                break;
+        }
+        int result;
+        Log.e("等等","orientation:"+cameraInfo.orientation+"   degrees:"+degrees);
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (cameraInfo.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (cameraInfo.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+
+
+    private int calcCameraRotation() {
+       return calcCameraRotation(cameraId, getWindowManager().getDefaultDisplay().getRotation());
+    }
+    /**
+     * Calculate camera rotation
+     *
+     * This calculation is applied to the output JPEG either via Exif Orientation tag
+     * or by actually transforming the bitmap. (Determined by vendor camera API implementation)
+     *
+     * Note: This is not the same calculation as the display orientation
+     *
+     * @param screenOrientationDegrees Screen orientation in degrees
+     * @return Number of degrees to rotate image in order for it to view correctly.
+     */
+    private int calcCameraRotation(int cameraId,int screenOrientationDegrees) {
+        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+        if (cameraInfo == null)
+            return 90;
+        if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            return (cameraInfo.orientation + screenOrientationDegrees) % 360;
+        } else {  // back-facing
+            final int landscapeFlip = isLandscape(screenOrientationDegrees) ? 180 : 0;
+            return (cameraInfo.orientation + screenOrientationDegrees + landscapeFlip) % 360;
+        }
+    }
+
+    private boolean isLandscape(int orientationDegrees) {
+        return (orientationDegrees == 90 ||
+                orientationDegrees == 270);
+    }
+
+    public Camera.CameraInfo getCameraInfo(int cameraId) {
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            try {
+                Camera.getCameraInfo(i, cameraInfo);
+                if (cameraInfo.facing == facing) {
+                    return cameraInfo;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();//为了防止有人将手机上的摄像头暴力拆除，导致读取摄像头数量正确，调用getCameraInfo来获取摄像头信息抛出异常
+            }
+        }
+        return null;
+    }
+
+
+    public void startPreview(int _cameraId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
+        if (_cameraId == -1) {
+            int numberOfCameras = Camera.getNumberOfCameras();
+            if (numberOfCameras == 0) {
+                new AlertDialog.Builder(CaptureActivity2.this)
+                        .setTitle(getString(R.string.error_camera_title))
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.error_no_camera))
+                        .setPositiveButton(getString(R.string.btn_ok), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .create().show();
+                return;
+            }
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            for (int i = 0; i < numberOfCameras; i++) {
+                try {
+                    Camera.getCameraInfo(i, cameraInfo);
+                    if (cameraInfo.facing == facing) {
+                        facing = cameraInfo.facing;
+                        cameraId = i;
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();//为了防止有人将手机上的摄像头暴力拆除，导致读取摄像头数量正确，调用getCameraInfo来获取摄像头信息抛出异常
+                }
+            }
+        } else
+            cameraId = _cameraId;
+        try {
+            camera = Camera.open(cameraId);
 
-        cameraView.start();
-        camera = ((Camera1) cameraView.getImpl()).getCamera();
-        bestSize = new Point(camera.getParameters().getPictureSize().width,camera.getParameters().getPictureSize().height);
+
+            int ori = getCameraDisplayOrientation(cameraId);
+            camera.setDisplayOrientation(ori);
+            camera.setPreviewDisplay(surfaceView.getHolder());
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            Camera.Parameters parameters = camera.getParameters();
+            bestSize = getBestCameraResolution(parameters, new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
+
+            Point bestPictureSize = getBestCameraResolution(parameters.getSupportedPictureSizes(), new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
+
+            parameters.setPreviewSize(bestSize.x, bestSize.y);
+            parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
+            if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            parameters.setRotation(calcCameraRotation());
+//            if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
+//            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+
+            camera.setParameters(parameters);
+            camera.startPreview();
+           // focusOnTouch(displayMetrics.widthPixels/2, displayMetrics.heightPixels/2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (camera != null) {
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+            }
+        }
+        if (camera == null) {
+            new AlertDialog.Builder(CaptureActivity2.this)
+                    .setTitle(getString(R.string.error_camera_title))
+                    .setCancelable(false)
+                    .setMessage(getString(R.string.error_open_camera))
+                    .setPositiveButton(getString(R.string.btn_ok), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .create().show();
+            return;
+        }
     }
 
     public void stopPreview() {
@@ -291,13 +454,76 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
      * @param view
      */
     public void switchCamera(View view) {
-        int facing = cameraView.getFacing();
-        facing =facing == CameraView.FACING_FRONT ? CameraView.FACING_BACK : CameraView.FACING_FRONT;
-        cameraView.setFacing(facing);
-        camera = ((Camera1) cameraView.getImpl()).getCamera();
-        bestSize = new Point(camera.getParameters().getPictureSize().width,camera.getParameters().getPictureSize().height);
+        int numberOfCameras = Camera.getNumberOfCameras();
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing != facing) {
+                stopPreview();
+                startPreview(i);
+                facing = cameraInfo.facing;
+                cameraId = i;
+                break;
+            }
+        }
     }
 
+    private Point getBestCameraResolution(Camera.Parameters parameters, Point screenResolution) {
+        float tmp = 0f;
+        float mindiff = 100f;
+        float x_d_y = (float) screenResolution.x / (float) screenResolution.y;
+        Camera.Size best = null;
+        List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+
+        for (Camera.Size s : supportedPreviewSizes) {
+            tmp = Math.abs(((float) s.height / (float) s.width) - x_d_y);
+            if (tmp < mindiff) {
+                mindiff = tmp;
+                best = s;
+            }
+        }
+        return new Point(best.width, best.height);
+    }
+
+
+    /**
+     * 我的选择策略：找到最接近屏幕尺寸的尽量大的哪一个尺寸，如果没有比它大的就选择支持的最大的,
+     *
+     * @param supportedSizes
+     * @param screenResolution
+     * @return
+     */
+    private Point getBestCameraResolution(List<Camera.Size> supportedSizes, Point screenResolution) {
+        Collections.sort(supportedSizes, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size lhs, Camera.Size rhs) {
+                return lhs.height*lhs.width>rhs.height*rhs.width?1:-1;
+            }
+        });
+
+        Camera.Size bestFitSize = null;
+        if (supportedSizes.size() > 0)
+            bestFitSize = supportedSizes.get(supportedSizes.size() - 1);
+
+
+//        for (int i = supportedSizes.size() - 2; i >= 0; i--) {
+//            Log.e("xxx",screenResolution.x+"    "+supportedSizes.get(i).height);
+//            /**本来是应该比较supportedSizes.get(i).width的，但是获取到的尺寸高度是正常的宽度*/
+//            if (screenResolution.x <= supportedSizes.get(i).width) {
+//                bestFitSize = supportedSizes.get(i);
+//                Log.e("xxx","step1");
+//            } else {
+//                Log.e("xxx","step2");
+//                if (bestFitSize == null)
+//                    bestFitSize = supportedSizes.get(i);
+//                break;
+//            }
+//        }
+//        if (bestFitSize == null)
+//            return screenResolution;
+
+        return new Point(bestFitSize.width, bestFitSize.height);
+    }
 
     private void enlarge() {
         ObjectAnimator smallScaleXAnimator = ObjectAnimator.ofFloat(viewSmall, "scaleX", 0.5f);
@@ -361,7 +587,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             data = null;
             showStart();
             stopVideo();
-            startPreview();
+            startPreview(cameraId);
 
             clearVideoFile();
         } else if (v.getId() == R.id.iv_ok) {
@@ -401,8 +627,17 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void takePicture() {
+        if (camera == null)
+            return;
         try {
-            cameraView.takePicture();
+            camera.takePicture(null, null, new Camera.PictureCallback() {
+                @Override
+                public void onPictureTaken(byte[] data, Camera camera) {
+                    CaptureActivity2.this.data = data;
+                    stopPreview();
+                    showDecide();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -460,11 +695,11 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             protected void onPostExecute(Photo photo) {
                 super.onPostExecute(photo);
-                CaptureActivity.this.data = null;
+                CaptureActivity2.this.data = null;
                 if (photo != null) {
                     send(photo);
                 } else
-                    Toast.makeText(CaptureActivity.this, "保存照片失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CaptureActivity2.this, "保存照片失败", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }.execute();
@@ -477,10 +712,17 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
      * @param camera
      */
     private Photo savePicture(byte[] data, Camera camera) throws IOException {
-        Camera.Size pictureSize = camera.getParameters().getPictureSize();
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Matrix matrix = new Matrix();
+//        matrix.postRotate(getRotateDegree(facing));
+        matrix.postRotate(calcCameraRotation());
+        Bitmap rotateBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        bitmap.recycle();
+
         Photo photo = new Photo();
-        photo.setWidth(pictureSize.width);
-        photo.setHeight(pictureSize.height);
+        photo.setWidth(rotateBitmap.getWidth());
+        photo.setHeight(rotateBitmap.getHeight());
         photo.setFullImage(false);
         photo.setMimetype("image/jpeg");
 
@@ -492,10 +734,11 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         if (!file.exists())
             file.createNewFile();
         outStream = new FileOutputStream(file, false);
+        rotateBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
         try {
-            outStream.write(data);
             outStream.flush();
             outStream.close();
+            rotateBitmap.recycle();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -504,6 +747,15 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         return photo;
     }
 
+    /**
+     * 保存图片的时候，后置摄像头需要旋转90度，前置摄像头需要旋转270度
+     *
+     * @param cameraId
+     * @return
+     */
+    private int getRotateDegree(int cameraId) {
+        return cameraId == Camera.CameraInfo.CAMERA_FACING_BACK ? 90 : 270;
+    }
 
     private String createPictureName() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMDD_hhmmss");
@@ -523,15 +775,9 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
                     Log.e("录视频", "错误码：" + what);
                 }
             });
-
-            Camera1 camera1 = (Camera1) cameraView.getImpl();
-            Camera camera = camera1.getCamera();
             camera.unlock();
-
             this.mMediaRecorder.setCamera(camera);
             this.mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-
             this.mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             this.mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             CamcorderProfile localObject = null;
@@ -539,7 +785,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             int[] camcorderQuality = {CamcorderProfile.QUALITY_1080P, CamcorderProfile.QUALITY_720P, CamcorderProfile.QUALITY_480P, CamcorderProfile.QUALITY_LOW};
             for (int quality :
                     camcorderQuality) {
-                if (CamcorderProfile.hasProfile(camera1.getCameraId(), quality)) {
+                if (CamcorderProfile.hasProfile(cameraId, quality)) {
                     localObject = CamcorderProfile.get(quality);
                     break;
                 }
@@ -558,7 +804,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             videoPath = file.getAbsolutePath();
             this.mMediaRecorder.setOutputFile(videoPath);
 
-            this.mMediaRecorder.setVideoSize(1920, 1080);
+            this.mMediaRecorder.setVideoSize(bestSize.x, bestSize.y);
             this.mMediaRecorder.setAudioEncodingBitRate(44100);
             if (((CamcorderProfile) localObject).videoBitRate > 2097152)
                 this.mMediaRecorder.setVideoEncodingBitRate(2097152);
@@ -567,9 +813,13 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
             // this.mMediaRecorder.setVideoFrameRate(((CamcorderProfile) localObject).videoFrameRate);
             this.mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             this.mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            this.mMediaRecorder.setPreviewDisplay(camera1.getSurface());
+            this.mMediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
 
-            mMediaRecorder.setOrientationHint(camera1.calcCameraRotation(getWindowManager().getDefaultDisplay().getRotation()));
+
+
+
+            mMediaRecorder.setOrientationHint(calcCameraRotation());
+//            mMediaRecorder.setOrientationHint(facing == Camera.CameraInfo.CAMERA_FACING_BACK ? 90 : 270);
             this.mMediaRecorder.prepare();
             mMediaRecorder.start();
         } catch (Exception localException) {
@@ -613,12 +863,10 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         if (path == null)
             return;
         try {
-            surfaceView.setVisibility(View.VISIBLE);
             mediaplayer = new MediaPlayer();
             mediaplayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaplayer.setDataSource(this, Uri.fromFile(new File(path)));
             mediaplayer.setDisplay(surfaceView.getHolder());
-//            mediaplayer.setSurface(((Camera1)cameraView.getImpl()).getSurface());
             mediaplayer.setLooping(true);
             mediaplayer.prepare();
             mediaplayer.start();
@@ -628,7 +876,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void stopVideo() {
-        surfaceView.setVisibility(View.INVISIBLE);
         if (mediaplayer == null) {
             return;
         }

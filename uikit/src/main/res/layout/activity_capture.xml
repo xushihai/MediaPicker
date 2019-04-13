@@ -5,11 +5,19 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto">
 
 
+    <com.google.android.cameraview.CameraView
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"/>
+
+
+
     <SurfaceView
+        android:visibility="invisible"
         android:id="@+id/surface_capture"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
     <ImageView
         android:id="@+id/iv_switch"

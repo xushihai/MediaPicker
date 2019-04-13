@@ -37,7 +37,7 @@
 
         <activity
             android:name=".activity.CaptureActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="sensor"
             android:theme="@style/CaptureTheme" />
 
         <activity

@@ -70,6 +70,10 @@ Step 2. Add the dependency
  exclude group: 'org.greenrobot', module: 'eventbus'
  exclude group: 'com.github.bumptech.glide', module: 'glide'
  ```
+
+
+ #混淆：
+ #-keep class com.google.android.cameraview.CameraView{*;}
  
  # 截图
  [![N|Solid](https://github.com/xushihai/MediaPicker/blob/master/shotcuts/device-2017-03-20-112104.png)]

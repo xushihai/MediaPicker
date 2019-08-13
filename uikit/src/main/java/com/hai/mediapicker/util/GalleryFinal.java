@@ -34,6 +34,22 @@ public class GalleryFinal {
         return iSaver;
     }
 
+    public static final int IMAGE_ENGINE_IMAGE_LOADER = 1;
+    public static final int IMAGE_ENGINE_GLIDE = 2;
+    private static int imageEngine = IMAGE_ENGINE_IMAGE_LOADER;
+
+    public static void setImageEngine(int imageEngine) {
+        if (imageEngine == IMAGE_ENGINE_IMAGE_LOADER) {
+            imageEngine = imageEngine;
+            return;
+        }
+        imageEngine = IMAGE_ENGINE_GLIDE;
+    }
+
+    public static int getImageEngine() {
+        return imageEngine;
+    }
+
     public static void selectMedias(Context context, int type, int maxSum, OnSelectMediaListener onSelectMediaListener) {
         mOnSelectMediaListener = onSelectMediaListener;
         Intent intent = new Intent(context, MediaPickerActivity.class);

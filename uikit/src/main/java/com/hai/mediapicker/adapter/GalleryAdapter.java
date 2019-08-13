@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.entity.PhotoDirectory;
+import com.hai.mediapicker.util.GalleryFinal;
 import com.hai.mediapicker.util.MediaManager;
 import com.hai.mediapicker.viewholder.GalleryHolder;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -86,13 +87,21 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         String url = "file:///" + photo.getPath();
         boolean check = MediaManager.getInstance().exsit(photo.getId());
         holder.thumbIv.justSetShowShade(check);
-        ImageLoader.getInstance().displayImage(url, holder.thumbIv);
-//        Glide.with(holder.thumbIv.getContext()).load(url)
-//                .placeholder(android.R.color.black)
-//                .priority(Priority.IMMEDIATE)
-//                .fitCenter()
-//                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                .into(holder.thumbIv);
+
+        switch (GalleryFinal.getImageEngine()) {
+            case GalleryFinal.IMAGE_ENGINE_IMAGE_LOADER:
+                ImageLoader.getInstance().displayImage(url, holder.thumbIv);
+                break;
+            default:
+                Glide.with(holder.thumbIv.getContext()).load(url)
+                        .placeholder(android.R.color.black)
+                        .priority(Priority.IMMEDIATE)
+                        .fitCenter()
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .into(holder.thumbIv);
+                break;
+        }
+
         holder.appCompatCheckBox.setChecked(check);
         if (photo.getMimetype().contains("video")) {
             holder.tvVideoDuration.setText(converDuration(photo.getDuration()));

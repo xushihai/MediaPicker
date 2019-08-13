@@ -36,23 +36,22 @@ public class MainActivity extends Activity {
 //        GalleryFinal.selectMedias(this, 10);
         EventBus.getDefault().register(this);
 
-//        GalleryFinal.selectMedias(this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
-//            @Override
-//            public void onSelected(ArrayList<Photo> photoArrayList) {
-//
-//            }
-//        });
         GalleryFinal.setDefaultSelfie(true);
         GalleryFinal.initSaver(new EncryptSaver(this));
-        GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+//        GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+//            @Override
+//            public void onSelected(Photo photo) {
+//                Log.e("拍摄", "拍摄完成：" + photo);
+//            }
+//        });
+
+
+        GalleryFinal.selectMedias(this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
             @Override
-            public void onSelected(Photo photo) {
-                Log.e("拍摄", "拍摄完成：" + photo);
+            public void onSelected(ArrayList<Photo> photoArrayList) {
+
             }
         });
-
-
-
 //        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 //                null, null, null, null);
 //        ArrayList<Photo> photoArrayList = new ArrayList<>();

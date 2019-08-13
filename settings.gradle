@@ -1,1 +1,1 @@
-include ':uikit', ':app', ':cameraview'
+include ':uikit', ':app'

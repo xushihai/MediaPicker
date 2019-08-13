@@ -25,6 +25,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hai.mediapicker.R;
+
 @TargetApi(14)
 public class TextureViewPreview extends PreviewImpl {
 

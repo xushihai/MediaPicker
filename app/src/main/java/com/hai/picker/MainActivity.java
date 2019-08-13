@@ -2,12 +2,12 @@ package com.hai.picker;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.save.ISaver;
@@ -34,24 +34,50 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        GalleryFinal.selectMedias(this, 10);
-        EventBus.getDefault().register(this);
-
-        GalleryFinal.setDefaultSelfie(true);
-        GalleryFinal.initSaver(new EncryptSaver(this));
-//        GalleryFinal.captureMedia(this,GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
-//            @Override
-//            public void onSelected(Photo photo) {
-//                Log.e("拍摄", "拍摄完成：" + photo);
-//            }
-//        });
-
-
-        GalleryFinal.selectMedias(this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        Button button = new Button(this);
+        button.setText("拍照");
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSelected(ArrayList<Photo> photoArrayList) {
+            public void onClick(View v) {
+
+                GalleryFinal.setDefaultSelfie(true);
+                GalleryFinal.initSaver(new EncryptSaver(MainActivity.this));
+                GalleryFinal.captureMedia(MainActivity.this, GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+                    @Override
+                    public void onSelected(Photo photo) {
+                        Log.e("拍摄", "拍摄完成：" + photo);
+                    }
+                });
+            }
+        });
+        linearLayout.addView(button);
+
+        button = new Button(this);
+        button.setText("查看图片");
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
             }
         });
+        linearLayout.addView(button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GalleryFinal.selectMedias(MainActivity.this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
+                    @Override
+                    public void onSelected(ArrayList<Photo> photoArrayList) {
+
+                    }
+                });
+            }
+        });
+        setContentView(linearLayout);
+        EventBus.getDefault().register(this);
+
+
 //        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 //                null, null, null, null);
 //        ArrayList<Photo> photoArrayList = new ArrayList<>();
@@ -69,7 +95,6 @@ public class MainActivity extends Activity {
 //        cursor.close();
 //        GalleryFinal.showMedias(this,photoArrayList);
     }
-
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)

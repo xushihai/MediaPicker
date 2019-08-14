@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```sh
 	dependencies {
-	        compile 'com.github.xushihai:MediaPicker:v3.0'
+	        compile 'com.github.xushihai:MediaPicker:v3.3'
 	}
 
 ```

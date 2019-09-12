@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_GLIDE);
                 GalleryFinal.setDefaultSelfie(true);
                 GalleryFinal.initSaver(new EncryptSaver(MainActivity.this));
                 GalleryFinal.captureMedia(MainActivity.this, GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_GLIDE);
                 GalleryFinal.selectMedias(MainActivity.this, GalleryFinal.TYPE_ALL, 10, new GalleryFinal.OnSelectMediaListener() {
                     @Override
                     public void onSelected(ArrayList<Photo> photoArrayList) {

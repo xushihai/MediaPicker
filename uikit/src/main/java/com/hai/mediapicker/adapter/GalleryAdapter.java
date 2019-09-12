@@ -94,6 +94,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                 break;
             default:
                 Glide.with(holder.thumbIv.getContext()).load(url)
+                        .asBitmap()
                         .placeholder(android.R.color.black)
                         .priority(Priority.IMMEDIATE)
                         .fitCenter()

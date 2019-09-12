@@ -40,10 +40,10 @@ public class GalleryFinal {
 
     public static void setImageEngine(int imageEngine) {
         if (imageEngine == IMAGE_ENGINE_IMAGE_LOADER) {
-            imageEngine = imageEngine;
+            GalleryFinal.imageEngine = imageEngine;
             return;
         }
-        imageEngine = IMAGE_ENGINE_GLIDE;
+        GalleryFinal.imageEngine = IMAGE_ENGINE_GLIDE;
     }
 
     public static int getImageEngine() {

@@ -82,7 +82,8 @@ public class MediaStoreHelper {
                             MediaStore.Video.Media.HEIGHT,
                             MediaStore.Images.Media.MIME_TYPE}
                     , MIME_TYPE + "=? or " + MIME_TYPE + "=? or " + MIME_TYPE + "=? "
-                    , new String[]{"image/jpeg", "image/png", "image/jpg"}
+                    , new String[]{"image/jpeg", "image/png", "image/gif"}
+//                    , new String[]{"image/jpeg", "image/png", "image/jpg"}
                     , MediaStore.Images.Media.DATE_ADDED + " DESC");
             if ((GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE) {
                 cursorArrayList.add(imageCursor);

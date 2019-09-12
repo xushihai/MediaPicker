@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```sh
 	dependencies {
-	        compile 'com.github.xushihai:MediaPicker:v3.3'
+	        compile 'com.github.xushihai:MediaPicker:v3.4'
 	}
 
 ```
@@ -32,6 +32,7 @@ Step 2. Add the dependency
         });
 ```
 
+#新增对gif的支持，不过需要调用GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_GLIDE);因为Glide框架对gif支持比较好
 
 ```sh
     使用EventBus3.0注册，接收选择好的图片和视频列表

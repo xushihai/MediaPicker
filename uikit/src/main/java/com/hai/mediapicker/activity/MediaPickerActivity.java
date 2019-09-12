@@ -1,13 +1,16 @@
 package com.hai.mediapicker.activity;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -116,10 +119,19 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getBaseContext(), PreviewActivity.class);
-                intent.putExtra(EXTREA_SELECT_MODE,selectMode);
+                intent.putExtra(EXTREA_SELECT_MODE, selectMode);
                 startActivity(intent);
             }
         });
+
+        CaptureActivity2.checkPermission(this);
+        loadMedia();
+    }
+
+    private void loadMedia() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
         MediaManager.getInstance().init();
         MediaStoreHelper.getPhotoDirs(this, getIntent().getIntExtra("type", GalleryFinal.TYPE_ALL), new MediaStoreHelper.PhotosResultCallback() {
@@ -137,6 +149,12 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
                 });
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        loadMedia();
     }
 
     protected void readIntentParams() {
@@ -240,7 +258,7 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             Intent intent = new Intent(view.getContext(), PreviewActivity.class);
             intent.putExtra("index", position);
             intent.putExtra("dir", MediaManager.getInstance().getSelectIndex());
-            intent.putExtra(EXTREA_SELECT_MODE,selectMode);
+            intent.putExtra(EXTREA_SELECT_MODE, selectMode);
             view.getContext().startActivity(intent);
         }
     }

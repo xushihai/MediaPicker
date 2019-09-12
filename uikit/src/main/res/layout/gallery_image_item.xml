@@ -9,7 +9,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
+    <TextView
+        android:id="@+id/tv_gif_flag"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:visibility="gone"
+        android:contentDescription="@null"
+        android:text="GIF" />
 
     <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/cb_media"

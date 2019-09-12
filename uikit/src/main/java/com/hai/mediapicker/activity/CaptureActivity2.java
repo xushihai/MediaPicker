@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -203,11 +204,11 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
             }
         });
         facing = GalleryFinal.isSelfie() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
-        checkPermission();
+        checkPermission(this);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private void checkPermission() {
+    public static void checkPermission(Activity activity) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return;
         }
@@ -219,12 +220,12 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
         };
         ArrayList<String> needRequestPermission = new ArrayList<>();
         for (int i = 0; i < permissions.length; i++) {
-            if (checkSelfPermission(permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+            if (activity.checkSelfPermission(permissions[i]) != PackageManager.PERMISSION_GRANTED) {
                 needRequestPermission.add(permissions[i]);
             }
         }
         if (!needRequestPermission.isEmpty()) {
-            requestPermissions(needRequestPermission.toArray(new String[needRequestPermission.size()]), 11);
+            activity.requestPermissions(needRequestPermission.toArray(new String[needRequestPermission.size()]), 11);
         }
     }
 

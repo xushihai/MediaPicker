@@ -18,7 +18,7 @@ import com.hai.mediapicker.view.SquareImageView;
 public class GalleryHolder extends RecyclerView.ViewHolder {
     public SquareImageView thumbIv;
     public AppCompatCheckBox appCompatCheckBox;
-    public TextView tvVideoDuration;
+    public TextView tvVideoDuration,tvGifFlag;
     public ImageView ivVideoFlag;
 
     public GalleryHolder(View itemView) {
@@ -28,6 +28,7 @@ public class GalleryHolder extends RecyclerView.ViewHolder {
         thumbIv.setScaleType(ImageView.ScaleType.CENTER_CROP);
         appCompatCheckBox = (AppCompatCheckBox) itemView.findViewById(R.id.cb_media);
         tvVideoDuration = (TextView) itemView.findViewById(R.id.tv_video_duration);
+        tvGifFlag = (TextView) itemView.findViewById(R.id.tv_gif_flag);
         ivVideoFlag = (ImageView) itemView.findViewById(R.id.iv_video_flag);
         thumbIv.setShade(new ColorDrawable(Color.parseColor("#92000000")));
     }

@@ -50,6 +50,7 @@ public class MediaStoreHelper {
         public void run() {
             if (contextWeakReference.get() == null)
                 return;
+
             ContentResolver contentResolver = contextWeakReference.get().getContentResolver();
             ArrayList<Cursor> cursorArrayList = new ArrayList<>();
             Cursor videoCursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI

@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.hai.mediapicker.activity.AlbumActivity;
 import com.hai.mediapicker.activity.CaptureActivity;
+import com.hai.mediapicker.activity.CaptureActivity2;
 import com.hai.mediapicker.activity.MediaPickerActivity;
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.save.BaseSaver;

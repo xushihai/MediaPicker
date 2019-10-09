@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,8 +106,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
         holder.appCompatCheckBox.setChecked(check);
         if (photo.getMimetype().contains("video")) {
             holder.tvVideoDuration.setText(converDuration(photo.getDuration()));
-        }else{
-            holder.tvGifFlag.setVisibility(photo.getPath().endsWith(".gif")?View.VISIBLE:View.GONE);//增加GIF标志
+        } else {
+            holder.tvGifFlag.setVisibility(photo.getPath().endsWith(".gif") ? View.VISIBLE : View.GONE);//增加GIF标志
         }
 
         holder.appCompatCheckBox.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +135,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
                     onItemClickListener.onItemClick(null, v, position, 0);
             }
         });
+
     }
 
     /**

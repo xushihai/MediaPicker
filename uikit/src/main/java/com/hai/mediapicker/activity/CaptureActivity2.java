@@ -74,6 +74,7 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
     MediaRecorder mMediaRecorder;
     String videoPath;
     Point bestSize;
+    Point bestPictureSize;
     MediaPlayer mediaplayer;
     View viewBig, viewSmall, viewSave;
     long start;
@@ -296,7 +297,7 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
                 break;
         }
         int result;
-        Log.e("等等","orientation:"+cameraInfo.orientation+"   degrees:"+degrees);
+        Log.e("等等", "orientation:" + cameraInfo.orientation + "   degrees:" + degrees);
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             result = (cameraInfo.orientation + degrees) % 360;
             result = (360 - result) % 360;  // compensate the mirror
@@ -308,30 +309,61 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
 
 
     private int calcCameraRotation() {
-       return calcCameraRotation(cameraId, getWindowManager().getDefaultDisplay().getRotation());
+        return calcCameraRotation(cameraId, getWindowManager().getDefaultDisplay().getRotation());
     }
+
     /**
      * Calculate camera rotation
-     *
+     * <p>
      * This calculation is applied to the output JPEG either via Exif Orientation tag
      * or by actually transforming the bitmap. (Determined by vendor camera API implementation)
-     *
+     * <p>
      * Note: This is not the same calculation as the display orientation
      *
      * @param screenOrientationDegrees Screen orientation in degrees
      * @return Number of degrees to rotate image in order for it to view correctly.
      */
-    private int calcCameraRotation(int cameraId,int screenOrientationDegrees) {
+//    private int calcCameraRotation(int cameraId, int screenOrientationDegrees) {
+//        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+//        if (cameraInfo == null)
+//            return 90;
+//        if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//            return (cameraInfo.orientation + screenOrientationDegrees) % 360;
+//        } else {  // back-facing
+//            final int landscapeFlip = isLandscape(screenOrientationDegrees) ? 180 : 0;
+//            return (cameraInfo.orientation + screenOrientationDegrees + landscapeFlip) % 360;
+//        }
+//    }
+    private int calcDisplayOrientation(int cameraId, int screenOrientationDegrees) {
         Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
-        if (cameraInfo == null)
-            return 90;
-        if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            return (360 - (cameraInfo.orientation + screenOrientationDegrees) % 360) % 360;
+        } else {  // back-facing
+            return (cameraInfo.orientation - screenOrientationDegrees + 360) % 360;
+        }
+    }
+
+    /**
+     * Calculate camera rotation
+     * <p>
+     * This calculation is applied to the output JPEG either via Exif Orientation tag
+     * or by actually transforming the bitmap. (Determined by vendor camera API implementation)
+     * <p>
+     * Note: This is not the same calculation as the display orientation
+     *
+     * @param screenOrientationDegrees Screen orientation in degrees
+     * @return Number of degrees to rotate image in order for it to view correctly.
+     */
+    public int calcCameraRotation(int cameraId, int screenOrientationDegrees) {
+        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             return (cameraInfo.orientation + screenOrientationDegrees) % 360;
         } else {  // back-facing
             final int landscapeFlip = isLandscape(screenOrientationDegrees) ? 180 : 0;
             return (cameraInfo.orientation + screenOrientationDegrees + landscapeFlip) % 360;
         }
     }
+
 
     private boolean isLandscape(int orientationDegrees) {
         return (orientationDegrees == 90 ||
@@ -395,27 +427,31 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
             camera = Camera.open(cameraId);
 
 
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
+
             int ori = getCameraDisplayOrientation(cameraId);
-            camera.setDisplayOrientation(ori);
+            camera.setDisplayOrientation(calcDisplayOrientation(cameraId, rotation));
+            Log.e("MediaPicker", "setDisplayOrientation:" + calcDisplayOrientation(cameraId, rotation));
             camera.setPreviewDisplay(surfaceView.getHolder());
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             Camera.Parameters parameters = camera.getParameters();
             bestSize = getBestCameraResolution(parameters, new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
 
-            Point bestPictureSize = getBestCameraResolution(parameters.getSupportedPictureSizes(), new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
+            bestPictureSize = getBestCameraResolution(parameters.getSupportedPictureSizes(), new Point(displayMetrics.widthPixels, displayMetrics.heightPixels));
 
             parameters.setPreviewSize(bestSize.x, bestSize.y);
             parameters.setPictureSize(bestPictureSize.x, bestPictureSize.y);
             if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO))
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-            parameters.setRotation(calcCameraRotation());
+            parameters.setRotation(calcCameraRotation(cameraId, rotation));
 //            if (parameters.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
 //            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-
+            Log.e("MediaPicker", "setRotation:" + calcCameraRotation(cameraId, rotation));
             camera.setParameters(parameters);
+            // camera.setDisplayOrientation(calcCameraRotation());
             camera.startPreview();
-           // focusOnTouch(displayMetrics.widthPixels/2, displayMetrics.heightPixels/2);
+            // focusOnTouch(displayMetrics.widthPixels/2, displayMetrics.heightPixels/2);
         } catch (Exception e) {
             e.printStackTrace();
             if (camera != null) {
@@ -439,6 +475,7 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
             return;
         }
     }
+
 
     public void stopPreview() {
         if (camera == null)
@@ -498,7 +535,7 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
         Collections.sort(supportedSizes, new Comparator<Camera.Size>() {
             @Override
             public int compare(Camera.Size lhs, Camera.Size rhs) {
-                return lhs.height*lhs.width>rhs.height*rhs.width?1:-1;
+                return lhs.height * lhs.width > rhs.height * rhs.width ? 1 : -1;
             }
         });
 
@@ -680,7 +717,7 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
         viewSave.setVisibility(View.VISIBLE);
     }
 
-    public void savePictureAsync(final byte[] data, final Camera camera) {
+    public void savePictureAsync(final byte[] data, final Camera c) {
         new AsyncTask<Void, Void, Photo>() {
 
             @Override
@@ -713,13 +750,17 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
      * @param camera
      */
     private Photo savePicture(byte[] data, Camera camera) throws IOException {
-
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        Matrix matrix = new Matrix();
-//        matrix.postRotate(getRotateDegree(facing));
-        matrix.postRotate(calcCameraRotation());
-        Bitmap rotateBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-        bitmap.recycle();
+        Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
+        Bitmap rotateBitmap = null;
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            rotateBitmap = bitmap;
+        } else {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(180);
+            rotateBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+            bitmap.recycle();
+        }
 
         Photo photo = new Photo();
         photo.setWidth(rotateBitmap.getWidth());
@@ -815,8 +856,6 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
             this.mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             this.mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             this.mMediaRecorder.setPreviewDisplay(surfaceView.getHolder().getSurface());
-
-
 
 
             mMediaRecorder.setOrientationHint(calcCameraRotation());

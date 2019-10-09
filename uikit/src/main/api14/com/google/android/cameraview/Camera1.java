@@ -94,7 +94,11 @@ public class Camera1 extends CameraViewImpl {
             setUpPreview();
         }
         mShowingPreview = true;
-        mCamera.startPreview();
+        try {
+            mCamera.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -103,7 +107,7 @@ public class Camera1 extends CameraViewImpl {
         if (mCamera != null) {
             try {
                 mCamera.stopPreview();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -292,9 +296,7 @@ public class Camera1 extends CameraViewImpl {
     }
 
     private void openCamera() {
-        if (mCamera != null) {
-            releaseCamera();
-        }
+        releaseCamera();
         mCamera = Camera.open(mCameraId);
         mCameraParameters = mCamera.getParameters();
         // Supported preview sizes
@@ -391,9 +393,9 @@ public class Camera1 extends CameraViewImpl {
      * Calculate display orientation
      * https://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation
      * (int)
-     *
+     * <p>
      * This calculation is used for orienting the preview
-     *
+     * <p>
      * Note: This is not the same calculation as the camera rotation
      *
      * @param screenOrientationDegrees Screen orientation in degrees
@@ -409,10 +411,10 @@ public class Camera1 extends CameraViewImpl {
 
     /**
      * Calculate camera rotation
-     *
+     * <p>
      * This calculation is applied to the output JPEG either via Exif Orientation tag
      * or by actually transforming the bitmap. (Determined by vendor camera API implementation)
-     *
+     * <p>
      * Note: This is not the same calculation as the display orientation
      *
      * @param screenOrientationDegrees Screen orientation in degrees
@@ -497,7 +499,7 @@ public class Camera1 extends CameraViewImpl {
         return mPreview.getSurface();
     }
 
-    public SurfaceHolder getSurfaceHoder(){
+    public SurfaceHolder getSurfaceHoder() {
         return mPreview.getSurfaceHolder();
     }
 }

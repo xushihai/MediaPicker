@@ -42,7 +42,10 @@
             android:name=".activity.CaptureActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CaptureTheme" />
-
+        <activity
+            android:name=".activity.CaptureActivity2"
+            android:screenOrientation="portrait"
+            android:theme="@style/CaptureTheme" />
         <activity
             android:name=".activity.VideoPlayer"
             android:screenOrientation="portrait"

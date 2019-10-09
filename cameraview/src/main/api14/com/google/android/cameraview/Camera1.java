@@ -21,7 +21,6 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.support.v4.util.SparseArrayCompat;
-import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
@@ -103,7 +102,7 @@ public class Camera1 extends CameraViewImpl {
         if (mCamera != null) {
             try {
                 mCamera.stopPreview();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -295,25 +294,29 @@ public class Camera1 extends CameraViewImpl {
         if (mCamera != null) {
             releaseCamera();
         }
-        mCamera = Camera.open(mCameraId);
-        mCameraParameters = mCamera.getParameters();
-        // Supported preview sizes
-        mPreviewSizes.clear();
-        for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
-            mPreviewSizes.add(new Size(size.width, size.height));
+        try {
+            mCamera = Camera.open(mCameraId);
+            mCameraParameters = mCamera.getParameters();
+            // Supported preview sizes
+            mPreviewSizes.clear();
+            for (Camera.Size size : mCameraParameters.getSupportedPreviewSizes()) {
+                mPreviewSizes.add(new Size(size.width, size.height));
+            }
+            // Supported picture sizes;
+            mPictureSizes.clear();
+            for (Camera.Size size : mCameraParameters.getSupportedPictureSizes()) {
+                mPictureSizes.add(new Size(size.width, size.height));
+            }
+            // AspectRatio
+            if (mAspectRatio == null) {
+                mAspectRatio = Constants.DEFAULT_ASPECT_RATIO;
+            }
+            adjustCameraParameters();
+            mCamera.setDisplayOrientation(calcDisplayOrientation(mDisplayOrientation));
+            mCallback.onCameraOpened();
+        } catch (Exception x) {
+            x.printStackTrace();
         }
-        // Supported picture sizes;
-        mPictureSizes.clear();
-        for (Camera.Size size : mCameraParameters.getSupportedPictureSizes()) {
-            mPictureSizes.add(new Size(size.width, size.height));
-        }
-        // AspectRatio
-        if (mAspectRatio == null) {
-            mAspectRatio = Constants.DEFAULT_ASPECT_RATIO;
-        }
-        adjustCameraParameters();
-        mCamera.setDisplayOrientation(calcDisplayOrientation(mDisplayOrientation));
-        mCallback.onCameraOpened();
     }
 
     private AspectRatio chooseAspectRatio() {
@@ -391,9 +394,9 @@ public class Camera1 extends CameraViewImpl {
      * Calculate display orientation
      * https://developer.android.com/reference/android/hardware/Camera.html#setDisplayOrientation
      * (int)
-     *
+     * <p>
      * This calculation is used for orienting the preview
-     *
+     * <p>
      * Note: This is not the same calculation as the camera rotation
      *
      * @param screenOrientationDegrees Screen orientation in degrees
@@ -409,10 +412,10 @@ public class Camera1 extends CameraViewImpl {
 
     /**
      * Calculate camera rotation
-     *
+     * <p>
      * This calculation is applied to the output JPEG either via Exif Orientation tag
      * or by actually transforming the bitmap. (Determined by vendor camera API implementation)
-     *
+     * <p>
      * Note: This is not the same calculation as the display orientation
      *
      * @param screenOrientationDegrees Screen orientation in degrees
@@ -497,7 +500,7 @@ public class Camera1 extends CameraViewImpl {
         return mPreview.getSurface();
     }
 
-    public SurfaceHolder getSurfaceHoder(){
+    public SurfaceHolder getSurfaceHoder() {
         return mPreview.getSurfaceHolder();
     }
 }

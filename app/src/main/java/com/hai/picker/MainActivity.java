@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_GLIDE);
-                GalleryFinal.setDefaultSelfie(true);
+                GalleryFinal.setDefaultSelfie(false);
                 GalleryFinal.initSaver(new EncryptSaver(MainActivity.this));
                 GalleryFinal.captureMedia(MainActivity.this, GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
                     @Override

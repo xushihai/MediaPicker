@@ -147,7 +147,6 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         rlStart.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.e("拍摄", event.getAction() + "");
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         start = System.currentTimeMillis();
@@ -180,6 +179,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         });
 
         cameraView.addCallback(new CameraView.Callback() {
+
             @Override
             public void onPictureTaken(CameraView cameraView, byte[] data) {
                 super.onPictureTaken(cameraView, data);
@@ -334,6 +334,7 @@ public class CaptureActivity extends AppCompatActivity implements View.OnClickLi
         super.onDestroy();
         captureVideo = null;
         GalleryFinal.mOnCaptureListener = null;
+        stopPreview();//之前退出去的时候没有释放camera，导致切换过摄像头并退出后再进来就会导致打开摄像头失败
         MemoryLeakUtil.fixInputMethodManagerLeak(this);
     }
 

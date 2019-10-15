@@ -128,12 +128,19 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         loadMedia();
     }
 
+    protected void readIntentParams() {
+
+    }
+
     private void loadMedia() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
         MediaManager.getInstance().init();
+        Intent intent = getIntent();
+        int maxMedia = intent.getIntExtra("maxSum", 9);
+        MediaManager.getInstance().setMaxMediaSum(maxMedia);
         MediaStoreHelper.getPhotoDirs(this, getIntent().getIntExtra("type", GalleryFinal.TYPE_ALL), new MediaStoreHelper.PhotosResultCallback() {
             @Override
             public void onResultCallback(List<PhotoDirectory> dirs) {
@@ -157,11 +164,6 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
         loadMedia();
     }
 
-    protected void readIntentParams() {
-        Intent intent = getIntent();
-        int maxMedia = intent.getIntExtra("maxSum", 9);
-        MediaManager.getInstance().setMaxMediaSum(maxMedia);
-    }
 
     private static boolean hasNavigationBar(Activity context) {
 //        IWindowManager mWindowManagerService = WindowManagerGlobal.getWindowManagerService();

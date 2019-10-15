@@ -16,8 +16,6 @@ public class AlbumActivity extends MediaPickerActivity implements MediaManager.O
 
 
     protected void readIntentParams() {
-        super.readIntentParams();
-
         Intent intent = getIntent();
         selectMode = intent.getBooleanExtra(EXTREA_SELECT_MODE, true);
         btnSend.setVisibility(selectMode ? View.VISIBLE : View.GONE);

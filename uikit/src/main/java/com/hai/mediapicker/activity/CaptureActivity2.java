@@ -753,13 +753,13 @@ public class CaptureActivity2 extends AppCompatActivity implements View.OnClickL
         Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         Camera.CameraInfo cameraInfo = getCameraInfo(cameraId);
         Bitmap rotateBitmap = null;
-        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            rotateBitmap = bitmap;
-        } else {
+        if(cameraInfo.facing== Camera.CameraInfo.CAMERA_FACING_FRONT) {
             Matrix matrix = new Matrix();
             matrix.postRotate(180);
             rotateBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
             bitmap.recycle();
+        }else{
+            rotateBitmap = bitmap;
         }
 
         Photo photo = new Photo();

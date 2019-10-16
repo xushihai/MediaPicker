@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 32
-        versionName "3.8"
+        versionCode 33
+        versionName "3.9"
     }
     sourceSets {
         main.java.srcDirs += 'src/main/base'

@@ -2,6 +2,7 @@ package com.hai.mediapicker.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -124,12 +125,37 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             }
         });
 
-        CaptureActivity2.checkPermission(this);
+        checkPermission(this);
+        MediaManager.getInstance().init();
+
         loadMedia();
     }
 
     protected void readIntentParams() {
+        Intent intent = getIntent();
+        int maxMedia = intent.getIntExtra("maxSum", 9);
+        MediaManager.getInstance().setMaxMediaSum(maxMedia);
+    }
 
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public static void checkPermission(Activity activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+        String[] permissions = {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        ArrayList<String> needRequestPermission = new ArrayList<>();
+        for (int i = 0; i < permissions.length; i++) {
+            if (activity.checkSelfPermission(permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                needRequestPermission.add(permissions[i]);
+            }
+        }
+        if (!needRequestPermission.isEmpty()) {
+            activity.requestPermissions(needRequestPermission.toArray(new String[needRequestPermission.size()]), 11);
+        }
     }
 
     private void loadMedia() {
@@ -137,10 +163,6 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
             return;
         }
 
-        MediaManager.getInstance().init();
-        Intent intent = getIntent();
-        int maxMedia = intent.getIntExtra("maxSum", 9);
-        MediaManager.getInstance().setMaxMediaSum(maxMedia);
         MediaStoreHelper.getPhotoDirs(this, getIntent().getIntExtra("type", GalleryFinal.TYPE_ALL), new MediaStoreHelper.PhotosResultCallback() {
             @Override
             public void onResultCallback(List<PhotoDirectory> dirs) {
@@ -151,7 +173,8 @@ public class MediaPickerActivity extends AppCompatActivity implements MediaManag
                     @Override
                     public void run() {
                         directoryChanged();
-                        tvDirectory.setText(MediaManager.getInstance().getPhotoDirectorys().get(0).getName());
+                        if (MediaManager.getInstance().getPhotoDirectorys().size() > 0)
+                            tvDirectory.setText(MediaManager.getInstance().getPhotoDirectorys().get(0).getName());
                     }
                 });
             }

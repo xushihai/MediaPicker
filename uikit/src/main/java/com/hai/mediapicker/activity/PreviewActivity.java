@@ -28,6 +28,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.load.resource.bitmap.TransformationUtils;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
 import com.hai.mediapicker.util.GalleryFinal;
@@ -36,6 +42,7 @@ import com.hai.mediapicker.util.MemoryLeakUtil;
 import com.hai.mediapicker.view.TouchImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.LoadedFrom;
 import com.nostra13.universalimageloader.core.display.BitmapDisplayer;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
@@ -298,7 +305,6 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
         public void bindData(Photo photo) {
             url = "file:///" + photo.getPath();
             this.photo = photo;
-
             switch (GalleryFinal.getImageEngine()) {
                 case GalleryFinal.IMAGE_ENGINE_IMAGE_LOADER:
                     ImageLoader.getInstance().displayImage(url, touchImageView, displayImageOptions, new SimpleImageLoadingListener() {
@@ -314,12 +320,24 @@ public class PreviewActivity extends AppCompatActivity implements MediaManager.O
                     });
                     break;
                 default:
+                    SimpleTarget<GlideDrawable> simpleTarget = new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation glideAnimation) {
+                            touchImageView.setImageDrawable(resource);
+                            try {
+                                touchImageView.setZoom(1f);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
                     Glide.with(touchImageView.getContext()).load(url)
                             .placeholder(android.R.color.black)
                             .priority(Priority.IMMEDIATE)
                             .transform(new FitOrCenterBitmapTransformation(touchImageView.getContext(), photo.getWidth(), photo.getHeight()))
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .into(touchImageView);
+                            .into(simpleTarget);
                     break;
             }
         }

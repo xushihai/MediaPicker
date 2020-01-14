@@ -21,4 +21,12 @@
     <string name="play_video_fail">play video fail</string>
     <string name="select_media">Select</string>
     <string name="edit">Edit</string>
+
+
+    <string name="toast_save">Saved to system album</string>
+    <string name="error_no_camera">It is detected that the current mobile phone does not have a camera</string>
+    <string name="error_open_camera">Unable to get camera data, please open camera permission in mobile app permission management。</string>
+    <string name="error_camera_title">Tips</string>
+    <string name="btn_ok">Determine</string>
+    <string name="total_play_error">Play error</string>
 </resources>

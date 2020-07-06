@@ -68,7 +68,7 @@ public class MemoryLeakUtil {
 
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+
             }
         }
     }

@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.hai.mediapicker.R;
 import com.hai.mediapicker.entity.Photo;
@@ -138,7 +137,7 @@ public class MediaStoreHelper {
                     photoDirectory = new PhotoDirectory();
                     photoDirectory.setId(bucketId);
                     photoDirectory.setName(name);
-                    photoDirectory.setCoverPath(path);
+                    photoDirectory.setCoverUri(photo);
                     photoDirectory.setDateAdded(data.getLong(data.getColumnIndexOrThrow(DATE_ADDED)));
                     directories.add(photoDirectory);
                 }
@@ -150,19 +149,19 @@ public class MediaStoreHelper {
             Collections.sort(photoDirectoryAll.getPhotos(), new Comparator<Photo>() {
                 @Override
                 public int compare(Photo lhs, Photo rhs) {
-                    if(lhs.getAdddate() == rhs.getAdddate())
+                    if (lhs.getAdddate() == rhs.getAdddate())
                         return 0;
                     return lhs.getAdddate() >= rhs.getAdddate() ? -1 : 1;//按照添加时间进行降序排序
                 }
             });
             if (photoDirectoryAll.getPhotoPaths().size() > 0) {
-                photoDirectoryAll.setCoverPath(photoDirectoryAll.getPhotoPaths().get(0));
+                photoDirectoryAll.setCoverUri(photoDirectoryAll.getPhotos().get(0));
             }
             if ((GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE)
                 directories.add(INDEX_ALL_PHOTOS, photoDirectoryAll);
             if (!videoDirectoryAll.getPhotos().isEmpty() && (GalleryFinal.TYPE_VIDEO & type) == GalleryFinal.TYPE_VIDEO) {
-                videoDirectoryAll.setCoverPath(videoDirectoryAll.getPhotoPaths().get(0));
-                int index = (GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE?INDEX_ALL_PHOTOS + 1:0;
+                videoDirectoryAll.setCoverUri(videoDirectoryAll.getPhotos().get(0));
+                int index = (GalleryFinal.TYPE_IMAGE & type) == GalleryFinal.TYPE_IMAGE ? INDEX_ALL_PHOTOS + 1 : 0;
                 directories.add(index, videoDirectoryAll);
             }
             if (resultCallback != null) {

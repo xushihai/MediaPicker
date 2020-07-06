@@ -2,6 +2,7 @@ package com.hai.picker;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -41,10 +42,14 @@ public class MainActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_GLIDE);
+                GalleryFinal.setImageEngine(GalleryFinal.IMAGE_ENGINE_IMAGE_LOADER);
                 GalleryFinal.setDefaultSelfie(false);
                 GalleryFinal.initSaver(new EncryptSaver(MainActivity.this));
-                GalleryFinal.captureMedia(MainActivity.this, GalleryFinal.TYPE_ALL, Environment.getExternalStorageDirectory().getAbsolutePath(), new GalleryFinal.OnCaptureListener() {
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+                if(Build.VERSION.SDK_INT>=29)
+                    path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath();
+                Log.e("拍摄",path);
+                GalleryFinal.captureMedia(MainActivity.this, GalleryFinal.TYPE_ALL, path, new GalleryFinal.OnCaptureListener() {
                     @Override
                     public void onSelected(Photo photo) {
                         Log.e("拍摄", "拍摄完成：" + photo);

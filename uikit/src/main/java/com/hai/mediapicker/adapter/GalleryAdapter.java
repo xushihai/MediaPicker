@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +85,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryHolder> {
             holder.appCompatCheckBox.setVisibility(View.GONE);
 
         final Photo photo = images.getPhotos().get(position);
-        String url = "file:///" + photo.getPath();
+        String url = photo.getMediaUri();
         boolean check = MediaManager.getInstance().exsit(photo.getId());
         holder.thumbIv.justSetShowShade(check);
 

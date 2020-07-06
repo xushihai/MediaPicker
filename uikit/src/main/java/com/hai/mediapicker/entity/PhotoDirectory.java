@@ -1,5 +1,9 @@
 package com.hai.mediapicker.entity;
 
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +14,7 @@ import java.util.List;
 public class PhotoDirectory {
 
     private int id;
-    private String coverPath;
+    private String coverUri;
     private String name;
     private long dateAdded;
     private List<Photo> photos = new ArrayList<>();
@@ -42,13 +46,21 @@ public class PhotoDirectory {
         this.id = id;
     }
 
-    public String getCoverPath() {
-        return coverPath;
+    public String getCoverUri() {
+        return coverUri;
     }
 
-    public void setCoverPath(String coverPath) {
-        this.coverPath = coverPath;
+    public void setCoverUri(Photo coverPath) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            Uri mediaUri = coverPath.getMimetype().startsWith("image")?MediaStore.Images.Media.EXTERNAL_CONTENT_URI:MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            int id = coverPath.getId();
+            this.coverUri = mediaUri.buildUpon().appendPath(String.valueOf(id)).build().toString();
+        } else {
+            this.coverUri = "file:///" + coverPath;
+        }
     }
+
+
 
     public String getName() {
         return name;

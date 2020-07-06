@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 29
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.hai.picker"
-        minSdkVersion 14
-        targetSdkVersion 23
+        minSdkVersion 29
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

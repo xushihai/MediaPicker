@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -59,7 +60,8 @@ public class VideoPlayer extends AppCompatActivity implements SurfaceHolder.Call
         video = (Photo) getIntent().getSerializableExtra("video");
         try {
             mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(video.getPath());
+//            mediaPlayer.setDataSource(video.getPath());
+            mediaPlayer.setDataSource(getBaseContext(), Uri.parse(video.getMediaUri()));
             SurfaceHolder surfaceHolder = ((SurfaceView) findViewById(R.id.surface_video)).getHolder();
             surfaceHolder.addCallback(this);
             mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {

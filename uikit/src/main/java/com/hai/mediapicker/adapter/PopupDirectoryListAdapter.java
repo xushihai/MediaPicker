@@ -4,6 +4,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,7 @@ public class PopupDirectoryListAdapter extends BaseAdapter {
         }
 
         public void bindData(PhotoDirectory directory) {
-            Glide.with(ivCover.getContext()).load("file:///" + directory.getCoverPath()).into(ivCover);
+            Glide.with(ivCover.getContext()).load(directory.getCoverUri()).into(ivCover);
             tvName.setText(directory.getName());
             tvCount.setText(tvCount.getContext().getString(R.string.__picker_image_count, directory.getPhotos().size()));
             ivSelect.setVisibility(directory.isSelected() ? View.VISIBLE : View.GONE);

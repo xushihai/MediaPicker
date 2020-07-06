@@ -9,6 +9,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.utils.L;
 import com.squareup.leakcanary.LeakCanary;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
@@ -42,6 +43,11 @@ public class App extends Application {
                 .defaultDisplayImageOptions(displayImageOptions)
                 .build();
         ImageLoader.getInstance().init(imageLoaderConfiguration);
+        if (BuildConfig.DEBUG) {
+            L.disableLogging();
+            L.writeLogs(false);
+            L.writeDebugLogs(false);
+        }
     }
 
     @Override

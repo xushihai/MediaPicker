@@ -1,5 +1,9 @@
 package com.hai.mediapicker.entity;
 
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
+
 import java.io.Serializable;
 
 /**
@@ -15,7 +19,8 @@ public class Photo implements Serializable {
     private long size;
     private long adddate;
     private boolean fullImage;//是否使用原图，默认图片传送需要进过压缩。
-    public Photo(int id, String path, String mimetype, int width, int height,long size) {
+
+    public Photo(int id, String path, String mimetype, int width, int height, long size) {
         this.id = id;
         this.path = path;
         this.mimetype = mimetype;
@@ -113,6 +118,15 @@ public class Photo implements Serializable {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public String getMediaUri() {
+        if (Build.VERSION.SDK_INT >= 29) {
+            Uri mediaUri = mimetype.startsWith("image") ? MediaStore.Images.Media.EXTERNAL_CONTENT_URI : MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            return mediaUri.buildUpon().appendPath(String.valueOf(getId())).build().toString();
+        } else {
+            return "file:///" + getPath();
+        }
     }
 
     @Override
